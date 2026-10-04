@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic AI Smart City — How the Five Agents Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ THEME ============ */
+  :root {
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+
+    --bg: #f5f4ef;
+    --surface: #ffffff;
+    --surface2: #edece5;
+    --surface-elevated: #fffdf8;
+    --border: rgba(24, 33, 48, 0.09);
+    --border-bright: rgba(24, 33, 48, 0.18);
+    --text: #182130;
+    --text-dim: #6b7482;
+
+    --navy: #1e3a5f;
+    --navy-dim: rgba(30, 58, 95, 0.09);
+    --gold: #a97b1e;
+    --gold-dim: rgba(169, 123, 30, 0.10);
+
+    /* Agent accents */
+    --traffic: #c2410c;   --traffic-dim: rgba(194, 65, 12, 0.10);
+    --waste: #4d7c0f;     --waste-dim: rgba(77, 124, 15, 0.10);
+    --energy: #b8892b;    --energy-dim: rgba(184, 137, 43, 0.12);
+    --water: #0e7490;     --water-dim: rgba(14, 116, 144, 0.10);
+    --emergency: #b91c1c; --emergency-dim: rgba(185, 28, 28, 0.10);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10161f;
+      --surface: #18202b;
+      --surface2: #202a37;
+      --surface-elevated: #1d2733;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-bright: rgba(255, 255, 255, 0.16);
+      --text: #e8ecf2;
+      --text-dim: #93a0b0;
+
+      --navy: #7fb0e6;
+      --navy-dim: rgba(127, 176, 230, 0.12);
+      --gold: #e3b455;
+      --gold-dim: rgba(227, 180, 85, 0.13);
+
+      --traffic: #f08a54;   --traffic-dim: rgba(240, 138, 84, 0.14);
+      --waste: #9ec95a;     --waste-dim: rgba(158, 201, 90, 0.14);
+      --energy: #e3b455;    --energy-dim: rgba(227, 180, 85, 0.14);
+      --water: #5bc4dd;     --water-dim: rgba(91, 196, 221, 0.14);
+      --emergency: #f08b8b; --emergency-dim: rgba(240, 139, 139, 0.14);
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 15% 0%, var(--gold-dim) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 45% at 88% 8%, var(--navy-dim) 0%, transparent 55%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-wrap: break-word;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============ ANIMATION ============ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reveal { animation: fadeUp 0.5s cubic-bezier(.2,.7,.3,1) both; animation-delay: calc(var(--i, 0) * 0.07s); }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* ============ NAV ============ */
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 28px;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .topnav__brand {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    white-space: nowrap;
+    margin-right: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .topnav__brand::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .topnav a {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s;
+  }
+  .topnav a:hover { color: var(--text); background: var(--surface2); }
+
+  /* ============ LAYOUT ============ */
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+
+  /* ============ HERO ============ */
+  .hero { padding: 72px 0 48px; }
+  .hero__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero__eyebrow::before {
+    content: '';
+    width: 28px; height: 1px;
+    background: var(--gold);
+    display: inline-block;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(34px, 5.2vw, 56px);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+    max-width: 16ch;
+    text-wrap: balance;
+  }
+  .hero__sub {
+    font-size: clamp(17px, 2vw, 20px);
+    color: var(--text-dim);
+    max-width: 62ch;
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  /* Loop strip */
+  .loop {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .loop__node {
+    flex: 1 1 200px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    min-width: 0;
+    box-shadow: 0 2px 10px rgba(24,33,48,0.04);
+  }
+  .loop__node .k {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .loop__node .v { font-weight: 600; font-size: 15px; }
+  .loop__node .d { font-size: 12.5px; color: var(--text-dim); margin-top: 2px; }
+  .loop__arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    color: var(--gold);
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .loop__node--core { background: var(--surface-elevated); border-color: color-mix(in srgb, var(--border) 40%, var(--gold) 60%); }
+
+  /* ============ SECTION ============ */
+  section { padding: 44px 0; }
+  .sec-head { margin-bottom: 26px; }
+  .sec-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 12px;
+  }
+  .sec-label::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--navy);
+    flex-shrink: 0;
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-size: clamp(24px, 3.4vw, 34px);
+    font-weight: 600;
+    letter-spacing: -0.6px;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+  .sec-head p { color: var(--text-dim); max-width: 68ch; margin-top: 12px; font-size: 15.5px; }
+
+  /* ============ MERMAID SHELL ============ */
+  .diagram-shell { position: relative; }
+  .diagram-shell__hint {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    opacity: 0.75;
+  }
+  .mermaid-wrap {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(24,33,48,0.05);
+  }
+  .mermaid-viewport {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    min-height: 460px;
+    cursor: grab;
+  }
+  .mermaid-viewport.is-panning { cursor: grabbing; }
+  .mermaid-canvas { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+  .mermaid-canvas svg { display: block; }
+  .zoom-controls {
+    position: absolute;
+    top: 10px; right: 10px;
+    display: flex;
+    gap: 2px;
+    z-index: 10;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+    box-shadow: 0 2px 8px rgba(24,33,48,0.07);
+  }
+  .zoom-controls button {
+    width: 30px; height: 30px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+  .zoom-controls button:hover { background: var(--surface2); color: var(--text); }
+  .zoom-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    padding: 0 8px;
+    display: flex; align-items: center;
+    white-space: nowrap;
+  }
+
+  /* Mermaid text follows page theme */
+  .mermaid-canvas .nodeLabel { color: var(--text) !important; }
+  .mermaid-canvas .edgeLabel { color: var(--text-dim) !important; background-color: var(--surface) !important; }
+  .mermaid-canvas .edgeLabel rect { fill: var(--surface) !important; }
+  .mermaid-canvas .node rect,
+  .mermaid-canvas .node polygon { stroke-width: 1.6px; }
+
+  /* ============ THREE PILLARS ============ */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 22px;
+  }
+  .pillar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 0;
+  }
+  .pillar .n {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .pillar h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .pillar p { font-size: 13.5px; color: var(--text-dim); line-height: 1.55; }
+
+  /* ============ AGENT EXPLORER ============ */
+  .agent-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .agent-chip {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-dim);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 9px 16px 9px 13px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.15s;
+  }
+  .agent-chip .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .agent-chip:hover { color: var(--text); transform: translateY(-1px); }
+  .agent-chip.is-active {
+    color: var(--text);
+    border-color: var(--ac);
+    background: var(--ac-dim);
+  }
+
+  .agent-panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--ac);
+    border-radius: 14px;
+    padding: 26px 28px;
+    box-shadow: 0 6px 24px rgba(24,33,48,0.06);
+    animation: fadeUp 0.35s ease-out both;
+  }
+  .agent-panel.is-active { display: block; }
+  .agent-panel__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 20px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .agent-panel__badge {
+    width: 46px; height: 46px;
+    border-radius: 11px;
+    background: var(--ac-dim);
+    border: 1px solid var(--ac);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .agent-panel__badge svg { width: 24px; height: 24px; stroke: var(--ac); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .agent-panel__title { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+  .agent-panel__tag { color: var(--text-dim); font-size: 14px; margin-top: 2px; }
+
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .step {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 14px 15px;
+    position: relative;
+    min-width: 0;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .step:hover { border-color: var(--ac); transform: translateY(-2px); }
+  .step__n {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--ac);
+    display: block;
+    margin-bottom: 8px;
+  }
+  .step__name { font-size: 13.5px; font-weight: 600; margin-bottom: 5px; line-height: 1.3; }
+  .step__desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+  .agent-panel__foot {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .agent-panel__foot .lbl {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .agent-panel__foot .val {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ac);
+    background: var(--ac-dim);
+    border-radius: 7px;
+    padding: 6px 12px;
+  }
+
+  /* ============ SHARED PATTERN ============ */
+  .pattern {
+    margin-top: 26px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .pattern__label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+  .pattern__flow { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+  .pattern__item {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 13px;
+  }
+  .pattern__sep { color: var(--gold); font-size: 15px; padding: 0 4px; }
+
+  /* ============ OUTCOMES ============ */
+  .outcomes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+  }
+  .outcome {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 20px;
+    min-width: 0;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .outcome:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(24,33,48,0.08); }
+  .outcome__icon { width: 30px; height: 30px; stroke: var(--gold); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; margin-bottom: 14px; }
+  .outcome h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .outcome p { font-size: 13.5px; color: var(--text-dim); line-height: 1.55; }
+
+  /* ============ SAFEGUARDS ============ */
+  .safe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .safe {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--navy);
+    border-radius: 0 11px 11px 0;
+    padding: 18px 20px;
+    min-width: 0;
+  }
+  .safe h3 { font-size: 14.5px; font-weight: 600; margin-bottom: 5px; }
+  .safe p { font-size: 13px; color: var(--text-dim); line-height: 1.55; }
+
+  /* ============ FOOTER ============ */
+  footer {
+    margin-top: 40px;
+    padding: 32px 0 56px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 12.5px;
+    font-family: var(--font-mono);
+    line-height: 1.7;
+  }
+
+
+  /* ============ PROTOTYPE ============ */
+  .proto-run {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    font-family: var(--font-mono); font-size: 12.5px; color: var(--text-dim);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 11px; padding: 13px 18px; margin-bottom: 20px;
+  }
+  .proto-run .k { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+  .proto-run .cmd { color: var(--text); font-weight: 600; background: var(--surface2); padding: 3px 9px; border-radius: 6px; }
+  .proto-run .sep { color: var(--border-bright); }
+
+  .proto-map { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .pcard {
+    background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--ac);
+    border-radius: 10px; padding: 14px 16px; min-width: 0;
+  }
+  .pcard__name { font-weight: 600; font-size: 13.5px; margin-bottom: 4px; }
+  .pcard__when { font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-bottom: 10px; }
+  .pcard__line {
+    font-family: var(--font-mono); font-size: 10.5px; line-height: 1.4; color: var(--text-dim);
+    background: var(--surface2); border-radius: 6px; padding: 7px 9px;
+    overflow-wrap: anywhere; border-left: 2px solid var(--ac);
+  }
+
+  /* collapsible */
+  details.collapsible { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 14px; background: var(--surface); }
+  details.collapsible summary {
+    padding: 14px 20px; font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    cursor: pointer; list-style: none; display: flex; align-items: center; gap: 9px; color: var(--text);
+    transition: background 0.15s ease;
+  }
+  details.collapsible summary:hover { background: var(--surface2); }
+  details.collapsible summary::-webkit-details-marker { display: none; }
+  details.collapsible summary::before { content: '\25B8'; font-size: 11px; color: var(--text-dim); transition: transform 0.15s ease; }
+  details.collapsible[open] summary::before { transform: rotate(90deg); }
+  details.collapsible .collapsible__body { padding: 16px 20px 20px; border-top: 1px solid var(--border); }
+
+  /* terminal */
+  .term { border: 1px solid #223029; border-radius: 10px; overflow: hidden; background: #0e1512; }
+  .term__header {
+    display: flex; align-items: center; gap: 9px; padding: 9px 15px;
+    background: #141d18; border-bottom: 1px solid #223029;
+    font-family: var(--font-mono); font-size: 11px; color: #7f9a86;
+  }
+  .term__header .dot { width: 8px; height: 8px; border-radius: 50%; background: #4d7c0f; flex-shrink: 0; }
+  .term__body {
+    font-family: var(--font-mono); font-size: 11.5px; line-height: 1.5; color: #cfe3d3;
+    padding: 16px 18px; white-space: pre; overflow: auto; max-height: 540px;
+  }
+
+  /* code file */
+  .code-file { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); }
+  .code-file__header {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 9px 15px; background: var(--surface2); border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: 11.5px; color: var(--text-dim);
+  }
+  .code-file__header .name { color: var(--text); font-weight: 600; }
+  .code-file__body {
+    font-family: var(--font-mono); font-size: 12px; line-height: 1.55; color: var(--text);
+    background: var(--surface-elevated); padding: 16px 18px; margin: 0;
+    white-space: pre; overflow: auto; max-height: 520px;
+  }
+
+  @media (max-width: 640px) {
+    .term__body, .code-file__body { font-size: 10.5px; }
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 900px) {
+    .steps { grid-template-columns: repeat(2, 1fr); }
+    .pillars { grid-template-columns: 1fr; }
+    .safe-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .wrap { padding: 0 18px; }
+    .topnav { padding: 10px 18px; }
+    .hero { padding: 44px 0 32px; }
+    .steps { grid-template-columns: 1fr; }
+    .loop__arrow { transform: rotate(90deg); width: 100%; justify-content: center; padding: 4px 0; }
+    .agent-panel { padding: 20px 18px; }
+    .mermaid-viewport { min-height: 380px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <span class="topnav__brand">Agentic AI Smart City</span>
+  <a href="#overview">Overview</a>
+  <a href="#agents">The five agents</a>
+  <a href="#outcomes">City outcomes</a>
+  <a href="#prototype">The prototype</a>
+  <a href="#safeguards">Safeguards</a>
+</nav>
+
+<header class="hero wrap">
+  <div class="hero__eyebrow reveal" style="--i:0">Smart city &middot; agentic AI platform</div>
+  <h1 class="reveal" style="--i:1">Five autonomous agents, one coordinated city</h1>
+  <p class="hero__sub reveal" style="--i:2">
+    Cameras and IoT sensors feed a layer of AI agents that watch, reason, and act across
+    city services in real time &mdash; so problems are caught and handled before they become
+    a resident's complaint.
+  </p>
+
+  <div class="loop reveal" style="--i:3">
+    <div class="loop__node">
+      <span class="k">Sensing layer</span>
+      <div class="v">Cameras + IoT sensors</div>
+      <div class="d">Traffic, bins, meters, water flow, citizen reports</div>
+    </div>
+    <div class="loop__arrow">&rarr;</div>
+    <div class="loop__node loop__node--core">
+      <span class="k">Agentic AI</span>
+      <div class="v">Five city agents</div>
+      <div class="d">Sense &rarr; detect &rarr; decide &rarr; act &rarr; track</div>
+    </div>
+    <div class="loop__arrow">&rarr;</div>
+    <div class="loop__node">
+      <span class="k">City services</span>
+      <div class="v">Teams &amp; responders</div>
+      <div class="d">Traffic authorities, crews, utilities, emergency services</div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ===== OVERVIEW ===== -->
+  <section id="overview">
+    <div class="sec-head">
+      <div class="sec-label">The platform at a glance</div>
+      <h2>Shared signals in, coordinated action out</h2>
+      <p>
+        Every agent draws from the same pool of sensors and cameras, then works through the
+        same rhythm: notice a change, decide what it means, and either act or hand a clear
+        recommendation to the people who can. The overview below shows how the pieces connect.
+      </p>
+    </div>
+
+    <div class="diagram-shell">
+      <p class="diagram-shell__hint">Drag to pan &middot; Ctrl/Cmd + scroll to zoom &middot; use the controls to fit or open full size</p>
+      <div class="mermaid-wrap">
+        <div class="zoom-controls">
+          <button type="button" data-action="zoom-in" title="Zoom in">+</button>
+          <button type="button" data-action="zoom-out" title="Zoom out">&minus;</button>
+          <button type="button" data-action="zoom-fit" title="Fit to view">&#8634;</button>
+          <button type="button" data-action="zoom-one" title="Actual size">1:1</button>
+          <button type="button" data-action="zoom-expand" title="Open full size">&#x26F6;</button>
+          <span class="zoom-label">Loading&hellip;</span>
+        </div>
+        <div class="mermaid-viewport">
+          <div class="mermaid mermaid-canvas"></div>
+        </div>
+      </div>
+      <script type="text/plain" class="diagram-source">
+flowchart TD
+  Sensors["Cameras + IoT Sensors<br/>traffic - bins - meters - flow"] --> Core["Agentic AI Layer<br/>sense - reason - act"]
+  Reports["Citizen Reports"] --> Core
+  Core --> Traffic["Traffic Agent"]
+  Core --> Waste["Waste Agent"]
+  Core --> Energy["Energy Agent"]
+  Core --> Water["Water Agent"]
+  Core --> Emergency["Emergency Agent"]
+  Traffic --> Services["City Services and Teams<br/>authorities - crews - utilities - responders"]
+  Waste --> Services
+  Energy --> Services
+  Water --> Services
+  Emergency --> Services
+
+  classDef src fill:#1e3a5f22,stroke:#1e3a5f,stroke-width:1.5px
+  classDef core fill:#a97b1e2b,stroke:#a97b1e,stroke-width:2px
+  classDef svc fill:#1e3a5f22,stroke:#1e3a5f,stroke-width:1.5px
+  classDef t fill:#c2410c22,stroke:#c2410c,stroke-width:1.5px
+  classDef w fill:#4d7c0f22,stroke:#4d7c0f,stroke-width:1.5px
+  classDef e fill:#b8892b22,stroke:#b8892b,stroke-width:1.5px
+  classDef wa fill:#0e749022,stroke:#0e7490,stroke-width:1.5px
+  classDef em fill:#b91c1c22,stroke:#b91c1c,stroke-width:1.5px
+
+  class Sensors,Reports src
+  class Core core
+  class Traffic t
+  class Waste w
+  class Energy e
+  class Water wa
+  class Emergency em
+  class Services svc
+      </script>
+    </div>
+
+    <div class="pillars">
+      <div class="pillar reveal" style="--i:0">
+        <div class="n">01 &middot; Sense</div>
+        <h3>Always watching</h3>
+        <p>Cameras, bin sensors, meters, and flow gauges stream live readings &mdash; no one has to phone in a problem for it to be noticed.</p>
+      </div>
+      <div class="pillar reveal" style="--i:1">
+        <div class="n">02 &middot; Reason</div>
+        <h3>Deciding, not just alerting</h3>
+        <p>Each agent turns raw signals into a judgement: is this congestion, a leak, an anomaly, an emergency &mdash; and what should happen next?</p>
+      </div>
+      <div class="pillar reveal" style="--i:2">
+        <div class="n">03 &middot; Act</div>
+        <h3>Action with a paper trail</h3>
+        <p>The agent acts or recommends, notifies the right team with full context, and keeps tracking until the issue is closed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AGENTS ===== -->
+  <section id="agents">
+    <div class="sec-head">
+      <div class="sec-label">The five agents</div>
+      <h2>Pick an agent to see how it works</h2>
+      <p>
+        Each agent specialises in one part of city life, but they follow the same five-step
+        rhythm. Select a service below to walk through what it monitors and what it does.
+      </p>
+    </div>
+
+    <div class="agent-chips" role="tablist">
+      <button class="agent-chip is-active" data-agent="traffic" style="--ac:var(--traffic);--ac-dim:var(--traffic-dim)"><span class="dot" style="background:var(--traffic)"></span>Traffic</button>
+      <button class="agent-chip" data-agent="waste" style="--ac:var(--waste);--ac-dim:var(--waste-dim)"><span class="dot" style="background:var(--waste)"></span>Waste</button>
+      <button class="agent-chip" data-agent="energy" style="--ac:var(--energy);--ac-dim:var(--energy-dim)"><span class="dot" style="background:var(--energy)"></span>Energy</button>
+      <button class="agent-chip" data-agent="water" style="--ac:var(--water);--ac-dim:var(--water-dim)"><span class="dot" style="background:var(--water)"></span>Water</button>
+      <button class="agent-chip" data-agent="emergency" style="--ac:var(--emergency);--ac-dim:var(--emergency-dim)"><span class="dot" style="background:var(--emergency)"></span>Emergency</button>
+    </div>
+
+    <!-- TRAFFIC -->
+    <div class="agent-panel is-active" data-agent="traffic" style="--ac:var(--traffic);--ac-dim:var(--traffic-dim)">
+      <div class="agent-panel__head">
+        <div class="agent-panel__badge"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="3"/><circle cx="12" cy="7" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="17" r="1.6"/></svg></div>
+        <div>
+          <div class="agent-panel__title">Traffic Agent</div>
+          <div class="agent-panel__tag">Keeps the city moving &mdash; easing jams and clearing incidents fast.</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="step__n">STEP 1</span><div class="step__name">Monitor</div><div class="step__desc">Traffic cameras and road sensors stream live conditions from intersections.</div></div>
+        <div class="step"><span class="step__n">STEP 2</span><div class="step__name">Detect</div><div class="step__desc">Spots congestion building or an accident as it happens.</div></div>
+        <div class="step"><span class="step__n">STEP 3</span><div class="step__name">Analyse</div><div class="step__desc">Works out the best alternative routes using travel time and road capacity.</div></div>
+        <div class="step"><span class="step__n">STEP 4</span><div class="step__name">Act</div><div class="step__desc">Recommends or triggers traffic-light timing changes to clear the flow.</div></div>
+        <div class="step"><span class="step__n">STEP 5</span><div class="step__name">Alert</div><div class="step__desc">Sends traffic authorities the recommendation with full context.</div></div>
+      </div>
+      <div class="agent-panel__foot"><span class="lbl">Acts on</span><span class="val">Traffic authorities</span><span class="lbl">Feedback</span><span class="val">Signal control</span></div>
+    </div>
+
+    <!-- WASTE -->
+    <div class="agent-panel" data-agent="waste" style="--ac:var(--waste);--ac-dim:var(--waste-dim)">
+      <div class="agent-panel__head">
+        <div class="agent-panel__badge"><svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M10 11v6M14 11v6"/></svg></div>
+        <div>
+          <div class="agent-panel__title">Waste Management Agent</div>
+          <div class="agent-panel__tag">Empty bins when they need it &mdash; not on a fixed schedule.</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="step__n">STEP 1</span><div class="step__name">Monitor</div><div class="step__desc">Smart bin sensors report fill level from bins across the city.</div></div>
+        <div class="step"><span class="step__n">STEP 2</span><div class="step__name">Detect</div><div class="step__desc">Flags bins that are approaching full capacity.</div></div>
+        <div class="step"><span class="step__n">STEP 3</span><div class="step__name">Predict</div><div class="step__desc">Forecasts which bins will fill soon, from historical fill patterns.</div></div>
+        <div class="step"><span class="step__n">STEP 4</span><div class="step__name">Optimise</div><div class="step__desc">Builds an efficient collection route that covers the priority bins first.</div></div>
+        <div class="step"><span class="step__n">STEP 5</span><div class="step__name">Notify</div><div class="step__desc">Sends the collection team the route and the priority list.</div></div>
+      </div>
+      <div class="agent-panel__foot"><span class="lbl">Acts on</span><span class="val">Waste-collection team</span><span class="lbl">Feedback</span><span class="val">Route plan</span></div>
+    </div>
+
+    <!-- ENERGY -->
+    <div class="agent-panel" data-agent="energy" style="--ac:var(--energy);--ac-dim:var(--energy-dim)">
+      <div class="agent-panel__head">
+        <div class="agent-panel__badge"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
+        <div>
+          <div class="agent-panel__title">Energy Agent</div>
+          <div class="agent-panel__tag">Watches consumption and trims waste before the bill arrives.</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="step__n">STEP 1</span><div class="step__name">Monitor</div><div class="step__desc">Live electricity consumption from buildings and streetlights.</div></div>
+        <div class="step"><span class="step__n">STEP 2</span><div class="step__name">Detect</div><div class="step__desc">Flags unusual consumption &mdash; spikes, anomalies, or faults.</div></div>
+        <div class="step"><span class="step__n">STEP 3</span><div class="step__name">Predict</div><div class="step__desc">Forecasts short-term demand for the hours ahead.</div></div>
+        <div class="step"><span class="step__n">STEP 4</span><div class="step__name">Act</div><div class="step__desc">Recommends or automatically applies energy-saving actions.</div></div>
+        <div class="step"><span class="step__n">STEP 5</span><div class="step__name">Report</div><div class="step__desc">Logs what changed and the effect, so savings can be verified.</div></div>
+      </div>
+      <div class="agent-panel__foot"><span class="lbl">Acts on</span><span class="val">Buildings &amp; streetlights</span><span class="lbl">Feedback</span><span class="val">Consumption log</span></div>
+    </div>
+
+    <!-- WATER -->
+    <div class="agent-panel" data-agent="water" style="--ac:var(--water);--ac-dim:var(--water-dim)">
+      <div class="agent-panel__head">
+        <div class="agent-panel__badge"><svg viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg></div>
+        <div>
+          <div class="agent-panel__title">Water Management Agent</div>
+          <div class="agent-panel__tag">Finds leaks early and follows them through to a fix.</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="step__n">STEP 1</span><div class="step__name">Monitor</div><div class="step__desc">Continuous flow and pressure readings across the water network.</div></div>
+        <div class="step"><span class="step__n">STEP 2</span><div class="step__name">Detect</div><div class="step__desc">Spots possible leaks from pressure drops and flow anomalies.</div></div>
+        <div class="step"><span class="step__n">STEP 3</span><div class="step__name">Locate</div><div class="step__desc">Narrows down the affected area or pipe segment.</div></div>
+        <div class="step"><span class="step__n">STEP 4</span><div class="step__name">Act</div><div class="step__desc">Raises a maintenance request with the location and evidence.</div></div>
+        <div class="step"><span class="step__n">STEP 5</span><div class="step__name">Track</div><div class="step__desc">Confirms whether the issue has been resolved, and keeps following up.</div></div>
+      </div>
+      <div class="agent-panel__foot"><span class="lbl">Acts on</span><span class="val">Maintenance crews</span><span class="lbl">Feedback</span><span class="val">Work-order status</span></div>
+    </div>
+
+    <!-- EMERGENCY -->
+    <div class="agent-panel" data-agent="emergency" style="--ac:var(--emergency);--ac-dim:var(--emergency-dim)">
+      <div class="agent-panel__head">
+        <div class="agent-panel__badge"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3z"/><path d="M12 10v4M12 17.2v.1"/></svg></div>
+        <div>
+          <div class="agent-panel__title">Emergency Agent</div>
+          <div class="agent-panel__tag">Fuses every signal to get responders there sooner.</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="step__n">STEP 1</span><div class="step__name">Ingest</div><div class="step__desc">Combines cameras, sensors, and citizen reports into one picture.</div></div>
+        <div class="step"><span class="step__n">STEP 2</span><div class="step__name">Detect</div><div class="step__desc">Recognises incidents such as fires or accidents in real time.</div></div>
+        <div class="step"><span class="step__n">STEP 3</span><div class="step__name">Route</div><div class="step__desc">Determines the relevant emergency service &mdash; fire, police, or medical.</div></div>
+        <div class="step"><span class="step__n">STEP 4</span><div class="step__name">Dispatch</div><div class="step__desc">Sends responders the location and incident information they need.</div></div>
+        <div class="step"><span class="step__n">STEP 5</span><div class="step__name">Track</div><div class="step__desc">Monitors the incident until it is resolved.</div></div>
+      </div>
+      <div class="agent-panel__foot"><span class="lbl">Acts on</span><span class="val">Emergency responders</span><span class="lbl">Feedback</span><span class="val">Incident status</span></div>
+    </div>
+
+    <div class="pattern reveal" style="--i:0">
+      <div class="pattern__label">The rhythm every agent shares</div>
+      <div class="pattern__flow">
+        <span class="pattern__item">Sense</span><span class="pattern__sep">&rarr;</span>
+        <span class="pattern__item">Detect</span><span class="pattern__sep">&rarr;</span>
+        <span class="pattern__item">Decide</span><span class="pattern__sep">&rarr;</span>
+        <span class="pattern__item">Act</span><span class="pattern__sep">&rarr;</span>
+        <span class="pattern__item">Track to resolution</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== OUTCOMES ===== -->
+  <section id="outcomes">
+    <div class="sec-head">
+      <div class="sec-label">What it delivers for the city</div>
+      <h2>The point of all this automation</h2>
+      <p>
+        The agents are a means, not the end. These are the outcomes the design is built to
+        produce for residents, crews, and the city's budget.
+      </p>
+    </div>
+
+    <div class="outcomes">
+      <div class="outcome reveal" style="--i:0">
+        <svg class="outcome__icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <h3>Faster response</h3>
+        <p>Incidents are noticed and routed in seconds, not after someone calls it in.</p>
+      </div>
+      <div class="outcome reveal" style="--i:1">
+        <svg class="outcome__icon" viewBox="0 0 24 24"><path d="M12 3v18M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>
+        <h3>Lower operating cost</h3>
+        <p>Crews are sent where they are actually needed, instead of running fixed rounds.</p>
+      </div>
+      <div class="outcome reveal" style="--i:2">
+        <svg class="outcome__icon" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z"/><path d="M9 12l2 2 4-4"/></svg>
+        <h3>Fewer disruptions</h3>
+        <p>Leaks, faults, and overloads are caught early, before they escalate into failures.</p>
+      </div>
+      <div class="outcome reveal" style="--i:3">
+        <svg class="outcome__icon" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+        <h3>Smarter energy use</h3>
+        <p>Waste and spikes are trimmed automatically, cutting consumption and emissions.</p>
+      </div>
+      <div class="outcome reveal" style="--i:4">
+        <svg class="outcome__icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        <h3>One coordinated view</h3>
+        <p>Five agents share the same signals, so departments stop working in silos.</p>
+      </div>
+      <div class="outcome reveal" style="--i:5">
+        <svg class="outcome__icon" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></svg>
+        <h3>Continuous improvement</h3>
+        <p>Every action and its outcome is logged, so the agents get sharper over time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROTOTYPE ===== -->
+  <section id="prototype">
+    <div class="sec-head">
+      <div class="sec-label">The prototype</div>
+      <h2>The same five agents, running in code</h2>
+      <p>
+        This is more than a diagram. The five agents are implemented as a working Python
+        simulation: a simulated sensor grid feeds each agent, every agent follows the shared
+        sense &rarr; detect &rarr; decide &rarr; act &rarr; track rhythm, and they share a message
+        bus &mdash; so the Emergency agent picks up accidents the Traffic agent has already flagged.
+        The full source and the output of a real run are below.
+      </p>
+    </div>
+
+    <div class="proto-run reveal" style="--i:0">
+      <span class="k">Run</span>
+      <span class="cmd">python3 smart_city_prototype.py</span>
+      <span class="sep">&middot;</span><span>Python 3.12</span>
+      <span class="sep">&middot;</span><span>seeded (SEED=42)</span>
+      <span class="sep">&middot;</span><span>6 zones &times; 10 cycles of 30 min</span>
+    </div>
+
+    <div class="proto-map reveal" style="--i:1">
+      <div class="pcard" style="--ac:var(--traffic)">
+        <div class="pcard__name">Traffic Agent</div>
+        <div class="pcard__when">Fires when congestion &ge; 0.70 or a camera sees an accident.</div>
+        <div class="pcard__line">TRAFFIC  DETECT  accident in North (congestion 0.90)</div>
+      </div>
+      <div class="pcard" style="--ac:var(--waste)">
+        <div class="pcard__name">Waste Agent</div>
+        <div class="pcard__when">Fires when any bin sensor reads &ge; 80% full.</div>
+        <div class="pcard__line">WASTE  OPTIMISE route: Central &rarr; East &rarr; Riverside</div>
+      </div>
+      <div class="pcard" style="--ac:var(--energy)">
+        <div class="pcard__name">Energy Agent</div>
+        <div class="pcard__when">Fires when consumption exceeds 1.6&times; the running baseline.</div>
+        <div class="pcard__line">ENERGY  ACT  shift load (~67.3 kWh saved)</div>
+      </div>
+      <div class="pcard" style="--ac:var(--water)">
+        <div class="pcard__name">Water Agent</div>
+        <div class="pcard__when">Fires when pressure &lt; 45 psi or flow &gt; 120 L/s.</div>
+        <div class="pcard__line">WATER  DETECT  possible leak in Riverside</div>
+      </div>
+      <div class="pcard" style="--ac:var(--emergency)">
+        <div class="pcard__name">Emergency Agent</div>
+        <div class="pcard__when">Fires on fire, citizen report, or a traffic-accident signal.</div>
+        <div class="pcard__line">EMERGENCY  DISPATCH unit PO-90 to North</div>
+      </div>
+    </div>
+
+    <details class="collapsible reveal" style="--i:2" open>
+      <summary>Run output &mdash; the actual log from a run</summary>
+      <div class="collapsible__body">
+        <div class="term">
+          <div class="term__header"><span class="dot"></span>smart_city_run_output.txt</div>
+          <div class="term__body"><span style="color:#4a5f52">==============================================================================</span>
+<span style="color:#e3b455">AGENTIC AI SMART CITY  -  simulation run</span>
+<span style="color:#e3b455">zones: Central, North, East, West, South, Riverside</span>
+<span style="color:#e3b455">10 cycles of 30 min, starting 07:00</span>
+<span style="color:#4a5f52">==============================================================================</span>
+
+<span style="color:#4a5f52">--- CYCLE 01  07:30 ----------------------------------------------------</span>
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Central flowing normally (0.39)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  North flowing normally (0.31)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  East flowing normally (0.28)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  West flowing normally (0.39)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  South flowing normally (0.25)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Riverside flowing normally (0.25)
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Central   bin  52.8%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  North     bin  31.1%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  East      bin  39.9%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  West      bin  36.8%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  South     bin  53.0%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Riverside bin  52.3%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#d7e4da">DECIDE</span>  no collection needed this cycle
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Central    104.7 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  North      108.3 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  East       118.1 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  West       128.8 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  South       97.5 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Riverside  116.5 kWh  normal
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Central   pressure 54.2 psi, flow 110.1 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  North     pressure 48.6 psi, flow 100.5 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  East      pressure 54.0 psi, flow 93.7 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  West      pressure 52.5 psi, flow 95.2 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  South     pressure 49.7 psi, flow 106.1 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Riverside pressure 48.4 psi, flow 102.7 L/s  ok
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#6f8a78">SENSE</span>  no active incidents
+
+<span style="color:#4a5f52">--- CYCLE 02  08:00 ----------------------------------------------------</span>
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Central flowing normally (0.28)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#e3b455">DETECT</span>  accident in North (congestion 0.90)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#d7e4da">DECIDE</span>  reroute + clear corridor; escalate to Emergency
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  East flowing normally (0.38)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  West flowing normally (0.32)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  South flowing normally (0.50)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#e3b455">DETECT</span>  congestion in Riverside (0.73)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#d7e4da">DECIDE</span>  alternative route via arterial; adjust signals
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Central   bin  61.3%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  North     bin  36.4%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  East      bin  46.6%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  West      bin  41.9%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  South     bin  58.8%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Riverside bin  59.3%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#d7e4da">DECIDE</span>  no collection needed this cycle
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Central    126.6 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  North      116.9 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  East       119.9 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  West       130.7 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  South      117.3 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Riverside  126.4 kWh  normal
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Central   pressure 53.8 psi, flow 107.3 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  North     pressure 48.3 psi, flow 99.1 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  East      pressure 53.5 psi, flow 96.3 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  West      pressure 53.1 psi, flow 94.1 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  South     pressure 50.0 psi, flow 105.5 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Riverside pressure 49.1 psi, flow 102.5 L/s  ok
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#e3b455">DETECT</span>  accident reported in North
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#e3b455">ROUTE</span>  relevant service: Police
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#f08b8b">DISPATCH</span>  unit PO-90 to North with location + incident data
+
+<span style="color:#4a5f52">--- CYCLE 03  08:30 ----------------------------------------------------</span>
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Central flowing normally (0.42)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  North flowing normally (0.49)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#e3b455">DETECT</span>  congestion in East (0.86)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#d7e4da">DECIDE</span>  alternative route via arterial; adjust signals
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  West flowing normally (0.45)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  South flowing normally (0.26)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Riverside flowing normally (0.25)
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Central   bin  69.9%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  North     bin  41.8%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  East      bin  53.3%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  West      bin  47.1%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  South     bin  64.7%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Riverside bin  66.4%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#d7e4da">DECIDE</span>  no collection needed this cycle
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Central    112.6 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  North      125.1 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  East       124.0 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  West       123.0 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  South      122.4 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Riverside  123.3 kWh  normal
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Central   pressure 53.4 psi, flow 107.6 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  North     pressure 49.0 psi, flow 100.2 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  East      pressure 52.9 psi, flow 98.6 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  West      pressure 53.5 psi, flow 95.7 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  South     pressure 49.7 psi, flow 104.2 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#e3b455">DETECT</span>  possible leak in Riverside (pressure 39.6 psi, flow 127.5 L/s)
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#5bc4dd">LOCATE</span>  segment isolated to Riverside distribution line
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#6f8a78">SENSE</span>  no active incidents
+
+<span style="color:#4a5f52">--- CYCLE 04  09:00 ----------------------------------------------------</span>
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Central flowing normally (0.48)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  North flowing normally (0.36)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  East flowing normally (0.49)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  West flowing normally (0.43)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  South flowing normally (0.41)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Riverside flowing normally (0.40)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: accident in North  (opened T2, closed T4)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: signal timing +12s, reroute traffic in Riverside  (opened T2, closed T4)
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Central   bin  78.5%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  North     bin  47.1%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  East      bin  60.0%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  West      bin  52.2%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  South     bin  70.6%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Riverside bin  73.4%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#d7e4da">DECIDE</span>  no collection needed this cycle
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Central    133.1 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  North      140.5 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  East       128.2 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  West       123.5 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  South      109.4 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Riverside  119.2 kWh  normal
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Central   pressure 54.1 psi, flow 109.4 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  North     pressure 48.6 psi, flow 98.6 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  East      pressure 53.0 psi, flow 96.1 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  West      pressure 53.8 psi, flow 97.6 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  South     pressure 50.5 psi, flow 104.4 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Riverside pressure 48.0 psi, flow 100.5 L/s  ok
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#6f8a78">SENSE</span>  no active incidents
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: accident in North -&gt; Police (PO-90)  (opened T2, closed T4)
+
+<span style="color:#4a5f52">--- CYCLE 05  09:30 ----------------------------------------------------</span>
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Central flowing normally (0.46)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  North flowing normally (0.27)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#e3b455">DETECT</span>  congestion in East (0.86)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#d7e4da">DECIDE</span>  alternative route via arterial; adjust signals
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  West flowing normally (0.31)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#e3b455">DETECT</span>  congestion in South (0.86)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#d7e4da">DECIDE</span>  alternative route via arterial; adjust signals
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#e3b455">DETECT</span>  congestion in Riverside (0.88)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#d7e4da">DECIDE</span>  alternative route via arterial; adjust signals
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: signal timing +12s, reroute traffic in East  (opened T3, closed T5)
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Central   bin  87.0%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  North     bin  52.5%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  East      bin  66.7%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  West      bin  57.3%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  South     bin  76.5%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Riverside bin  80.4%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#e3b455">DETECT</span>  2 bin(s) near capacity: Central, Riverside
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#d7e4da">PREDICT</span>  2 more bin(s) filling soon
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#9ec95a">OPTIMISE</span>  route: Central -&gt; East -&gt; Riverside
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Central    146.6 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  North      134.2 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  East       119.1 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  West       109.4 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  South       99.4 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Riverside  125.2 kWh  normal
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Central   pressure 54.3 psi, flow 106.5 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  North     pressure 49.0 psi, flow 96.0 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  East      pressure 52.3 psi, flow 93.3 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  West      pressure 53.6 psi, flow 97.7 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  South     pressure 50.1 psi, flow 104.4 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Riverside pressure 48.0 psi, flow 101.8 L/s  ok
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#e3b455">DETECT</span>  fire reported in Central
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#e3b455">ROUTE</span>  relevant service: Fire service
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#f08b8b">DISPATCH</span>  unit FI-23 to Central with location + incident data
+
+<span style="color:#4a5f52">--- CYCLE 06  10:00 ----------------------------------------------------</span>
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Central flowing normally (0.26)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  North flowing normally (0.22)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  East flowing normally (0.50)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  West flowing normally (0.44)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  South flowing normally (0.33)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Riverside flowing normally (0.50)
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Central   bin  95.6%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  North     bin  57.8%  ok
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  East      bin  73.4%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  West      bin  62.4%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  South     bin  82.3%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Riverside bin  87.4%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#e3b455">DETECT</span>  3 bin(s) near capacity: Central, South, Riverside
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#d7e4da">PREDICT</span>  2 more bin(s) filling soon
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#9ec95a">OPTIMISE</span>  route: Central -&gt; East -&gt; South -&gt; Riverside
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Central    131.5 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  North      121.7 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  East       122.7 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  West       115.9 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  South      104.3 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Riverside  118.7 kWh  normal
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Central   pressure 55.0 psi, flow 106.1 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  North     pressure 49.5 psi, flow 96.3 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  East      pressure 51.6 psi, flow 96.3 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  West      pressure 54.1 psi, flow 100.5 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  South     pressure 50.8 psi, flow 106.4 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Riverside pressure 47.5 psi, flow 101.7 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: leak repair in Riverside  (opened T3, closed T6)
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#e3b455">DETECT</span>  smoke near market reported in East
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#e3b455">ROUTE</span>  relevant service: Fire service
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#f08b8b">DISPATCH</span>  unit FI-72 to East with location + incident data
+
+<span style="color:#4a5f52">--- CYCLE 07  10:30 ----------------------------------------------------</span>
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Central flowing normally (0.47)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  North flowing normally (0.38)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  East flowing normally (0.33)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  West flowing normally (0.36)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  South flowing normally (0.26)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Riverside flowing normally (0.27)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: signal timing +12s, reroute traffic in East  (opened T5, closed T7)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: signal timing +12s, reroute traffic in South  (opened T5, closed T7)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: signal timing +12s, reroute traffic in Riverside  (opened T5, closed T7)
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Central   bin 100.0%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  North     bin  63.2%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  East      bin  80.1%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  West      bin  67.5%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  South     bin  88.2%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Riverside bin  94.5%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#e3b455">DETECT</span>  4 bin(s) near capacity: Central, East, South, Riverside
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#d7e4da">PREDICT</span>  2 more bin(s) filling soon
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#9ec95a">OPTIMISE</span>  route: Central -&gt; North -&gt; East -&gt; South -&gt; Riverside
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Central    119.9 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  North      119.7 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  East       147.1 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  West       305.9 kWh  SPIKE
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#e3b455">DETECT</span>  abnormal consumption in West (305.9 vs 126.0 kWh)
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#d7e4da">PREDICT</span>  demand will stay high; load-shift advised
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#9ec95a">ACT</span>  dim non-critical lighting + shift load (~67.3 kWh saved)
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  South      119.0 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Riverside  135.9 kWh  normal
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Central   pressure 54.2 psi, flow 106.6 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  North     pressure 49.5 psi, flow 98.4 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  East      pressure 51.0 psi, flow 99.1 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  West      pressure 53.4 psi, flow 98.6 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  South     pressure 50.9 psi, flow 107.5 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Riverside pressure 47.1 psi, flow 99.4 L/s  ok
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#6f8a78">SENSE</span>  no active incidents
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: fire in Central -&gt; Fire service (FI-23)  (opened T5, closed T7)
+
+<span style="color:#4a5f52">--- CYCLE 08  11:00 ----------------------------------------------------</span>
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Central flowing normally (0.38)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#e3b455">DETECT</span>  congestion in North (0.90)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#d7e4da">DECIDE</span>  alternative route via arterial; adjust signals
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  East flowing normally (0.29)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#e3b455">DETECT</span>  congestion in West (0.73)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#d7e4da">DECIDE</span>  alternative route via arterial; adjust signals
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  South flowing normally (0.23)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Riverside flowing normally (0.28)
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Central   bin 100.0%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  North     bin  68.5%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  East      bin  86.8%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  West      bin  72.6%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  South     bin  94.1%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Riverside bin 100.0%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#e3b455">DETECT</span>  4 bin(s) near capacity: Central, East, South, Riverside
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#d7e4da">PREDICT</span>  2 more bin(s) filling soon
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#9ec95a">OPTIMISE</span>  route: Central -&gt; North -&gt; East -&gt; South -&gt; Riverside
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Central    135.3 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  North      120.0 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  East       137.0 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  West       143.1 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  South      110.2 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Riverside  136.1 kWh  normal
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Central   pressure 55.0 psi, flow 109.6 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  North     pressure 48.9 psi, flow 96.7 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  East      pressure 50.7 psi, flow 101.7 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  West      pressure 54.0 psi, flow 100.9 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  South     pressure 50.7 psi, flow 105.4 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Riverside pressure 47.6 psi, flow 100.6 L/s  ok
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#6f8a78">SENSE</span>  no active incidents
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: smoke near market in East -&gt; Fire service (FI-72)  (opened T6, closed T8)
+
+<span style="color:#4a5f52">--- CYCLE 09  11:30 ----------------------------------------------------</span>
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Central flowing normally (0.22)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  North flowing normally (0.47)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  East flowing normally (0.45)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#e3b455">DETECT</span>  congestion in West (0.78)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#d7e4da">DECIDE</span>  alternative route via arterial; adjust signals
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  South flowing normally (0.47)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Riverside flowing normally (0.46)
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Central   bin 100.0%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  North     bin  73.9%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  East      bin  93.4%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  West      bin  77.8%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  South     bin 100.0%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Riverside bin 100.0%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#e3b455">DETECT</span>  4 bin(s) near capacity: Central, East, South, Riverside
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#d7e4da">PREDICT</span>  2 more bin(s) filling soon
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#9ec95a">OPTIMISE</span>  route: Central -&gt; North -&gt; East -&gt; South -&gt; Riverside
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Central    148.2 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  North      117.4 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  East       145.7 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  West       133.8 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  South      123.5 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Riverside  156.6 kWh  normal
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Central   pressure 55.6 psi, flow 107.2 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  North     pressure 48.7 psi, flow 95.4 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  East      pressure 49.9 psi, flow 103.3 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  West      pressure 54.2 psi, flow 99.4 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  South     pressure 51.1 psi, flow 105.8 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Riverside pressure 47.5 psi, flow 97.7 L/s  ok
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#6f8a78">SENSE</span>  no active incidents
+
+<span style="color:#4a5f52">--- CYCLE 10  12:00 ----------------------------------------------------</span>
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Central flowing normally (0.46)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  North flowing normally (0.28)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  East flowing normally (0.23)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  West flowing normally (0.46)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  South flowing normally (0.44)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#6f8a78">SENSE</span>  Riverside flowing normally (0.29)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: signal timing +12s, reroute traffic in North  (opened T8, closed T10)
+<span style="color:#f08a54;font-weight:600">TRAFFIC</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: signal timing +12s, reroute traffic in West  (opened T8, closed T10)
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Central   bin 100.0%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  North     bin  79.2%  filling
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  East      bin 100.0%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  West      bin  82.9%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  South     bin 100.0%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#6f8a78">SENSE</span>  Riverside bin 100.0%  FULL
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#e3b455">DETECT</span>  5 bin(s) near capacity: Central, East, West, South, Riverside
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#d7e4da">PREDICT</span>  1 more bin(s) filling soon
+<span style="color:#9ec95a;font-weight:600">WASTE</span>  <span style="color:#9ec95a">OPTIMISE</span>  route: Central -&gt; North -&gt; East -&gt; West -&gt; South -&gt; Riverside
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Central    135.8 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  North      119.0 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  East       129.7 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  West       151.8 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  South      150.1 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#6f8a78">SENSE</span>  Riverside  149.3 kWh  normal
+<span style="color:#e3b455;font-weight:600">ENERGY</span>  <span style="color:#5bc4dd">TRACK</span>  resolved: energy-saving applied in West (~67.3 kWh)  (opened T7, closed T10)
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Central   pressure 55.8 psi, flow 105.1 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  North     pressure 49.4 psi, flow 97.5 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  East      pressure 50.6 psi, flow 105.1 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  West      pressure 54.9 psi, flow 96.6 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  South     pressure 51.5 psi, flow 104.7 L/s  ok
+<span style="color:#5bc4dd;font-weight:600">WATER</span>  <span style="color:#6f8a78">SENSE</span>  Riverside pressure 48.2 psi, flow 99.5 L/s  ok
+<span style="color:#f08b8b;font-weight:600">EMERGENCY</span>  <span style="color:#6f8a78">SENSE</span>  no active incidents
+
+<span style="color:#4a5f52">==============================================================================</span>
+<span style="color:#e3b455">RUN SUMMARY</span>
+<span style="color:#4a5f52">==============================================================================</span>
+  TRAFFIC    detected  9  |  actions  9
+  WASTE      detected 22  |  actions  6
+  ENERGY     detected  1  |  actions  1
+  WATER      detected  1  |  actions  1
+  EMERGENCY  detected  3  |  actions  3
+  TOTAL      detected 36  |  actions 20
+
+  records raised : 20
+  resolved       : 13
+  still open     : 7
+  avg resolution : 2.2 cycles (~65 min)
+
+  city-services inbox (what teams received):
+    - Traffic authority          9 message(s)
+    - Waste-collection team      6 message(s)
+    - Facilities / energy desk   1 message(s)
+    - Maintenance crew           1 message(s)
+    - Emergency responders       3 message(s)
+<span style="color:#4a5f52">==============================================================================</span>
+</div>
+        </div>
+      </div>
+    </details>
+
+    <details class="collapsible reveal" style="--i:3">
+      <summary>Full source &mdash; smart_city_prototype.py</summary>
+      <div class="collapsible__body">
+        <div class="code-file">
+          <div class="code-file__header"><span class="name">smart_city_prototype.py</span><span>Python 3.12 &middot; self-contained</span></div>
+          <pre class="code-file__body"><code>&quot;&quot;&quot;
+Agentic AI Smart City - working prototype
+=========================================
+
+A self-contained simulation of the five city agents described in the design:
+
+    Cameras + IoT Sensors  -&gt;  Agentic AI (5 agents)  -&gt;  City Services
+
+Each agent follows the shared rhythm:  SENSE -&gt; DETECT -&gt; DECIDE -&gt; ACT -&gt; TRACK.
+
+This is a demonstration model: sensors are simulated with a seeded random
+generator so a run is fully reproducible. Run it with:
+
+    python3 smart_city_prototype.py
+
+Author: prototype for the Agentic AI Smart City concept.
+&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import random
+from dataclasses import dataclass, field
+from statistics import mean
+
+SEED = 42
+random.seed(SEED)
+
+ZONES = [&quot;Central&quot;, &quot;North&quot;, &quot;East&quot;, &quot;West&quot;, &quot;South&quot;, &quot;Riverside&quot;]
+TICKS = 10  # each tick = 30 minutes of city time
+START_HOUR = 7.0
+
+
+# ---------------------------------------------------------------------------
+# Shared infrastructure: the message bus and city services
+# ---------------------------------------------------------------------------
+
+@dataclass
+class Record:
+    &quot;&quot;&quot;A single action / work order / incident raised by an agent.&quot;&quot;&quot;
+    tick: int
+    agent: str
+    kind: str          # action | recommendation | work_order | incident | alert
+    target: str        # zone or team
+    detail: str
+    status: str = &quot;open&quot;
+    opened_tick: int = 0
+    closed_tick: int | None = None
+
+
+class CityServices:
+    &quot;&quot;&quot;The outside world: authorities, crews and responders the agents act on.&quot;&quot;&quot;
+
+    def __init__(self):
+        self.inbox: dict[str, list[str]] = {
+            &quot;Traffic authority&quot;: [],
+            &quot;Waste-collection team&quot;: [],
+            &quot;Facilities / energy desk&quot;: [],
+            &quot;Maintenance crew&quot;: [],
+            &quot;Emergency responders&quot;: [],
+        }
+
+    def dispatch(self, team: str, message: str):
+        self.inbox[team].append(message)
+
+
+class MessageBus:
+    &quot;&quot;&quot;Shared memory so agents can coordinate (e.g. traffic feeds emergency).&quot;&quot;&quot;
+
+    def __init__(self):
+        self.records: list[Record] = []
+        self.signals: list[dict] = []   # cross-agent signals for the same tick
+
+    def emit(self, rec: Record):
+        self.records.append(rec)
+
+    def publish_signal(self, signal: dict):
+        self.signals.append(signal)
+
+    def drain_signals(self) -&gt; list[dict]:
+        out = self.signals[:]
+        self.signals.clear()
+        return out
+
+
+# ---------------------------------------------------------------------------
+# Simulated sensing layer
+# ---------------------------------------------------------------------------
+
+class SensorGrid:
+    &quot;&quot;&quot;Produces simulated camera / IoT readings for the current tick.&quot;&quot;&quot;
+
+    def __init__(self):
+        self.tick = 0
+        self.bin_fill = {z: random.uniform(25, 55) for z in ZONES}
+        self.bin_rate = {z: random.uniform(5.0, 9.0) for z in ZONES}  # %/tick
+        self.base_energy = {z: random.uniform(80, 140) for z in ZONES}  # kWh
+        self.pressure = {z: random.uniform(48, 55) for z in ZONES}  # psi
+        self.flow = {z: random.uniform(95, 110) for z in ZONES}  # L/s
+        # pre-scripted events so the demo always shows every agent firing
+        self.scripted = {
+            2: {&quot;accident&quot;: &quot;North&quot;},
+            3: {&quot;leak&quot;: &quot;Riverside&quot;},
+            5: {&quot;fire&quot;: &quot;Central&quot;},
+            6: {&quot;citizen_report&quot;: (&quot;East&quot;, &quot;smoke near market&quot;)},
+            7: {&quot;energy_spike&quot;: &quot;West&quot;},
+        }
+
+    def advance(self, tick: int):
+        self.tick = tick
+        # bins fill gradually
+        for z in ZONES:
+            self.bin_fill[z] = min(100, self.bin_fill[z] + self.bin_rate[z])
+        # energy: gentle daily curve + noise
+        for z in ZONES:
+            shape = 1.0 + 0.35 * (tick / TICKS)
+            self.base_energy[z] = max(30, self.base_energy[z] * 0.6 + random.uniform(70, 150) * shape * 0.4)
+        # water pressure / flow drift
+        for z in ZONES:
+            self.pressure[z] += random.uniform(-0.8, 0.8)
+            self.flow[z] += random.uniform(-3, 3)
+
+    # ---- readings -----------------------------------------------------
+    def traffic_reading(self, zone: str) -&gt; dict:
+        base = random.uniform(0.2, 0.5)
+        if random.random() &lt; 0.16:
+            base = random.uniform(0.7, 0.95)  # congestion builds
+        reading = {&quot;zone&quot;: zone, &quot;congestion&quot;: round(base, 2), &quot;accident&quot;: False}
+        ev = self.scripted.get(self.tick, {})
+        if ev.get(&quot;accident&quot;) == zone:
+            reading[&quot;accident&quot;] = True
+            reading[&quot;congestion&quot;] = 0.9
+        return reading
+
+    def bin_reading(self, zone: str) -&gt; dict:
+        return {&quot;zone&quot;: zone, &quot;fill&quot;: round(self.bin_fill[zone], 1),
+                &quot;rate&quot;: round(self.bin_rate[zone], 2)}
+
+    def energy_reading(self, zone: str) -&gt; dict:
+        val = self.base_energy[zone]
+        ev = self.scripted.get(self.tick, {})
+        if ev.get(&quot;energy_spike&quot;) == zone:
+            val *= 2.4  # abnormal spike
+        return {&quot;zone&quot;: zone, &quot;kwh&quot;: round(val, 1)}
+
+    def water_reading(self, zone: str) -&gt; dict:
+        p, f = self.pressure[zone], self.flow[zone]
+        ev = self.scripted.get(self.tick, {})
+        if ev.get(&quot;leak&quot;) == zone:
+            p -= 9.0     # pressure drop
+            f += 28.0    # unexplained flow
+        return {&quot;zone&quot;: zone, &quot;pressure&quot;: round(p, 1), &quot;flow&quot;: round(f, 1)}
+
+    def emergency_reading(self) -&gt; dict:
+        ev = self.scripted.get(self.tick, {})
+        out = {&quot;fire_zone&quot;: None, &quot;citizen_report&quot;: None}
+        if ev.get(&quot;fire&quot;):
+            out[&quot;fire_zone&quot;] = ev[&quot;fire&quot;]
+        if ev.get(&quot;citizen_report&quot;):
+            out[&quot;citizen_report&quot;] = ev[&quot;citizen_report&quot;]
+        return out
+
+
+# ---------------------------------------------------------------------------
+# Agents
+# ---------------------------------------------------------------------------
+
+class Agent:
+    name = &quot;Agent&quot;
+    team = &quot;City services&quot;
+
+    def __init__(self, sensors: SensorGrid, bus: MessageBus, services: CityServices):
+        self.sensors = sensors
+        self.bus = bus
+        self.services = services
+        self.detected = 0
+        self.actions = 0
+
+    def step(self, tick: int, log):
+        raise NotImplementedError
+
+    # helpers -----------------------------------------------------------
+    def _open(self, tick, kind, target, detail) -&gt; Record:
+        rec = Record(tick=tick, agent=self.name, kind=kind, target=target,
+                     detail=detail, opened_tick=tick)
+        self.bus.emit(rec)
+        return rec
+
+    def resolve_due(self, tick, log, after_ticks: int, kinds=(&quot;work_order&quot;, &quot;incident&quot;)):
+        &quot;&quot;&quot;TRACK: close items this agent owns once enough ticks have passed.&quot;&quot;&quot;
+        for rec in self.bus.records:
+            if (rec.agent == self.name and rec.status == &quot;open&quot;
+                    and rec.kind in kinds and tick - rec.opened_tick &gt;= after_ticks):
+                rec.status = &quot;closed&quot;
+                rec.closed_tick = tick
+                log(f&quot;{self.name:&lt;9} TRACK    resolved: {rec.detail}  (opened T{rec.opened_tick}, closed T{tick})&quot;)
+
+
+class TrafficAgent(Agent):
+    name = &quot;TRAFFIC&quot;
+    team = &quot;Traffic authority&quot;
+
+    def step(self, tick, log):
+        for z in ZONES:
+            r = self.sensors.traffic_reading(z)
+            if r[&quot;accident&quot;]:
+                self.detected += 1
+                log(f&quot;{self.name:&lt;9} DETECT   accident in {z} (congestion {r[&#x27;congestion&#x27;]:.2f})&quot;)
+                log(f&quot;{self.name:&lt;9} DECIDE   reroute + clear corridor; escalate to Emergency&quot;)
+                self._open(tick, &quot;incident&quot;, z, f&quot;accident in {z}&quot;)
+                self.bus.publish_signal({&quot;type&quot;: &quot;traffic_accident&quot;, &quot;zone&quot;: z})
+                self.services.dispatch(self.team, f&quot;Accident in {z}: corridor cleared, signals overridden&quot;)
+                self.actions += 1
+            elif r[&quot;congestion&quot;] &gt;= 0.7:
+                self.detected += 1
+                log(f&quot;{self.name:&lt;9} DETECT   congestion in {z} ({r[&#x27;congestion&#x27;]:.2f})&quot;)
+                log(f&quot;{self.name:&lt;9} DECIDE   alternative route via arterial; adjust signals&quot;)
+                self._open(tick, &quot;action&quot;, z, f&quot;signal timing +12s, reroute traffic in {z}&quot;)
+                self.services.dispatch(self.team, f&quot;Congestion in {z}: signals adjusted, reroute advised&quot;)
+                self.actions += 1
+            else:
+                log(f&quot;{self.name:&lt;9} SENSE    {z} flowing normally ({r[&#x27;congestion&#x27;]:.2f})&quot;)
+        self.resolve_due(tick, log, after_ticks=2, kinds=(&quot;incident&quot;, &quot;action&quot;))
+
+
+class WasteAgent(Agent):
+    name = &quot;WASTE&quot;
+    team = &quot;Waste-collection team&quot;
+
+    def step(self, tick, log):
+        readings = [self.sensors.bin_reading(z) for z in ZONES]
+        full = [r for r in readings if r[&quot;fill&quot;] &gt;= 80]
+        soon = [r for r in readings if 60 &lt;= r[&quot;fill&quot;] &lt; 80]
+        for r in readings:
+            flag = &quot;FULL&quot; if r[&quot;fill&quot;] &gt;= 80 else (&quot;filling&quot; if r[&quot;fill&quot;] &gt;= 60 else &quot;ok&quot;)
+            log(f&quot;{self.name:&lt;9} SENSE    {r[&#x27;zone&#x27;]:&lt;9} bin {r[&#x27;fill&#x27;]:&gt;5.1f}%  {flag}&quot;)
+        if full:
+            self.detected += len(full)
+            route = self._optimise_route([r[&quot;zone&quot;] for r in full] + [r[&quot;zone&quot;] for r in soon[:1]])
+            log(f&quot;{self.name:&lt;9} DETECT   {len(full)} bin(s) near capacity: {&#x27;, &#x27;.join(r[&#x27;zone&#x27;] for r in full)}&quot;)
+            log(f&quot;{self.name:&lt;9} PREDICT  {len(soon)} more bin(s) filling soon&quot;)
+            log(f&quot;{self.name:&lt;9} OPTIMISE route: {&#x27; -&gt; &#x27;.join(route)}&quot;)
+            self._open(tick, &quot;work_order&quot;, &quot;route&quot;, f&quot;collect: {&#x27; -&gt; &#x27;.join(route)}&quot;)
+            self.services.dispatch(self.team, f&quot;Optimised route: {&#x27; -&gt; &#x27;.join(route)}&quot;)
+            self.actions += 1
+        else:
+            log(f&quot;{self.name:&lt;9} DECIDE   no collection needed this cycle&quot;)
+
+    @staticmethod
+    def _optimise_route(zones: list[str]) -&gt; list[str]:
+        # greedy nearest-neighbour over zone order (deterministic demo)
+        remaining = [z for z in ZONES if z in set(zones)]
+        return remaining if remaining else zones
+
+
+class EnergyAgent(Agent):
+    name = &quot;ENERGY&quot;
+    team = &quot;Facilities / energy desk&quot;
+
+    def __init__(self, *a, **k):
+        super().__init__(*a, **k)
+        self.history: list[float] = []
+
+    def step(self, tick, log):
+        readings = [self.sensors.energy_reading(z) for z in ZONES]
+        vals = [r[&quot;kwh&quot;] for r in readings]
+        self.history.extend(vals)
+        baseline = mean(self.history) if self.history else mean(vals)
+        for r in readings:
+            spike = r[&quot;kwh&quot;] &gt; baseline * 1.6
+            tag = &quot;SPIKE&quot; if spike else &quot;normal&quot;
+            log(f&quot;{self.name:&lt;9} SENSE    {r[&#x27;zone&#x27;]:&lt;9} {r[&#x27;kwh&#x27;]:&gt;6.1f} kWh  {tag}&quot;)
+            if spike:
+                self.detected += 1
+                saved = round(r[&quot;kwh&quot;] * 0.22, 1)
+                log(f&quot;{self.name:&lt;9} DETECT   abnormal consumption in {r[&#x27;zone&#x27;]} ({r[&#x27;kwh&#x27;]:.1f} vs {baseline:.1f} kWh)&quot;)
+                log(f&quot;{self.name:&lt;9} PREDICT  demand will stay high; load-shift advised&quot;)
+                log(f&quot;{self.name:&lt;9} ACT      dim non-critical lighting + shift load (~{saved} kWh saved)&quot;)
+                self._open(tick, &quot;action&quot;, r[&quot;zone&quot;], f&quot;energy-saving applied in {r[&#x27;zone&#x27;]} (~{saved} kWh)&quot;)
+                self.services.dispatch(self.team, f&quot;Anomaly in {r[&#x27;zone&#x27;]}: saving action applied&quot;)
+                self.actions += 1
+        self.resolve_due(tick, log, after_ticks=3, kinds=(&quot;action&quot;,))
+
+
+class WaterAgent(Agent):
+    name = &quot;WATER&quot;
+    team = &quot;Maintenance crew&quot;
+
+    def step(self, tick, log):
+        for z in ZONES:
+            r = self.sensors.water_reading(z)
+            leak = r[&quot;flow&quot;] &gt; 120 or r[&quot;pressure&quot;] &lt; 45
+            if leak:
+                self.detected += 1
+                log(f&quot;{self.name:&lt;9} DETECT   possible leak in {z} (pressure {r[&#x27;pressure&#x27;]} psi, flow {r[&#x27;flow&#x27;]} L/s)&quot;)
+                log(f&quot;{self.name:&lt;9} LOCATE   segment isolated to {z} distribution line&quot;)
+                self._open(tick, &quot;work_order&quot;, z, f&quot;leak repair in {z}&quot;)
+                self.services.dispatch(self.team, f&quot;Leak suspected in {z}: work order raised&quot;)
+                self.actions += 1
+            else:
+                log(f&quot;{self.name:&lt;9} SENSE    {z:&lt;9} pressure {r[&#x27;pressure&#x27;]} psi, flow {r[&#x27;flow&#x27;]} L/s  ok&quot;)
+        self.resolve_due(tick, log, after_ticks=3, kinds=(&quot;work_order&quot;,))
+
+
+class EmergencyAgent(Agent):
+    name = &quot;EMERGENCY&quot;
+    team = &quot;Emergency responders&quot;
+
+    def step(self, tick, log):
+        # INGEST from cameras/sensors AND from other agents via the bus
+        signals = self.bus.drain_signals()
+        incidents = []
+        for s in signals:
+            if s[&quot;type&quot;] == &quot;traffic_accident&quot;:
+                incidents.append((s[&quot;zone&quot;], &quot;accident&quot;, &quot;Police&quot;))
+        r = self.sensors.emergency_reading()
+        if r[&quot;fire_zone&quot;]:
+            incidents.append((r[&quot;fire_zone&quot;], &quot;fire&quot;, &quot;Fire service&quot;))
+        if r[&quot;citizen_report&quot;]:
+            zone, desc = r[&quot;citizen_report&quot;]
+            incidents.append((zone, desc, &quot;Fire service&quot;))
+
+        if not incidents:
+            log(f&quot;{self.name:&lt;9} SENSE    no active incidents&quot;)
+        for zone, kind, service in incidents:
+            self.detected += 1
+            unit = f&quot;{service.split()[0][:2].upper()}-{random.randint(10, 99)}&quot;
+            log(f&quot;{self.name:&lt;9} DETECT   {kind} reported in {zone}&quot;)
+            log(f&quot;{self.name:&lt;9} ROUTE    relevant service: {service}&quot;)
+            log(f&quot;{self.name:&lt;9} DISPATCH unit {unit} to {zone} with location + incident data&quot;)
+            self._open(tick, &quot;incident&quot;, zone, f&quot;{kind} in {zone} -&gt; {service} ({unit})&quot;)
+            self.services.dispatch(self.team, f&quot;{service}: {kind} at {zone}, unit {unit} dispatched&quot;)
+            self.actions += 1
+        self.resolve_due(tick, log, after_ticks=2, kinds=(&quot;incident&quot;,))
+
+
+# ---------------------------------------------------------------------------
+# Simulation runner
+# ---------------------------------------------------------------------------
+
+def run():
+    sensors = SensorGrid()
+    bus = MessageBus()
+    services = CityServices()
+    agents = [
+        TrafficAgent(sensors, bus, services),
+        WasteAgent(sensors, bus, services),
+        EnergyAgent(sensors, bus, services),
+        WaterAgent(sensors, bus, services),
+        EmergencyAgent(sensors, bus, services),
+    ]
+
+    lines: list[str] = []
+
+    def log(msg: str):
+        lines.append(msg)
+        print(msg)
+
+    log(&quot;=&quot; * 78)
+    log(&quot;AGENTIC AI SMART CITY  -  simulation run&quot;)
+    log(f&quot;zones: {&#x27;, &#x27;.join(ZONES)}&quot;)
+    log(f&quot;{TICKS} cycles of 30 min, starting {int(START_HOUR):02d}:00&quot;)
+    log(&quot;=&quot; * 78)
+
+    for tick in range(1, TICKS + 1):
+        sensors.advance(tick)
+        hour = START_HOUR + tick * 0.5
+        hh, mm = int(hour), int((hour % 1) * 60)
+        log(&quot;&quot;)
+        log(f&quot;--- CYCLE {tick:02d}  {hh:02d}:{mm:02d} &quot; + &quot;-&quot; * 52)
+        for agent in agents:
+            agent.step(tick, log)
+
+    # ---- final report -------------------------------------------------
+    log(&quot;&quot;)
+    log(&quot;=&quot; * 78)
+    log(&quot;RUN SUMMARY&quot;)
+    log(&quot;=&quot; * 78)
+    total_detected = sum(a.detected for a in agents)
+    total_actions = sum(a.actions for a in agents)
+    for a in agents:
+        log(f&quot;  {a.name:&lt;10} detected {a.detected:&gt;2}  |  actions {a.actions:&gt;2}&quot;)
+    log(f&quot;  {&#x27;TOTAL&#x27;:&lt;10} detected {total_detected:&gt;2}  |  actions {total_actions:&gt;2}&quot;)
+
+    closed = [r for r in bus.records if r.status == &quot;closed&quot;]
+    open_ = [r for r in bus.records if r.status == &quot;open&quot;]
+    res_times = [r.closed_tick - r.opened_tick for r in closed if r.closed_tick is not None]
+    log(&quot;&quot;)
+    log(f&quot;  records raised : {len(bus.records)}&quot;)
+    log(f&quot;  resolved       : {len(closed)}&quot;)
+    log(f&quot;  still open     : {len(open_)}&quot;)
+    if res_times:
+        log(f&quot;  avg resolution : {mean(res_times):.1f} cycles (~{mean(res_times)*30:.0f} min)&quot;)
+    log(&quot;&quot;)
+    log(&quot;  city-services inbox (what teams received):&quot;)
+    for team, msgs in services.inbox.items():
+        log(f&quot;    - {team:&lt;26} {len(msgs)} message(s)&quot;)
+    log(&quot;=&quot; * 78)
+
+    return &quot;\n&quot;.join(lines)
+
+
+if __name__ == &quot;__main__&quot;:
+    output = run()
+    with open(&quot;smart_city_run_output.txt&quot;, &quot;w&quot;) as fh:
+        fh.write(output + &quot;\n&quot;)
+    print(&quot;\n[output also written to smart_city_run_output.txt]&quot;)
+</code></pre>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===== SAFEGUARDS ===== -->
+  <section id="safeguards">
+    <div class="sec-head">
+      <div class="sec-label">Keeping it trustworthy</div>
+      <h2>Autonomy with guardrails</h2>
+      <p>
+        Agents that can act on the city need clear limits. These principles keep the system
+        accountable to the people it serves.
+      </p>
+    </div>
+
+    <div class="safe-grid">
+      <div class="safe reveal" style="--i:0">
+        <h3>Humans in the loop</h3>
+        <p>Agents recommend; people approve the high-stakes calls. Automated action is reserved for low-risk, reversible changes.</p>
+      </div>
+      <div class="safe reveal" style="--i:1">
+        <h3>Privacy by design</h3>
+        <p>Camera and sensor data is processed under clear policy controls, with retention limits and access rules built in.</p>
+      </div>
+      <div class="safe reveal" style="--i:2">
+        <h3>Explainable decisions</h3>
+        <p>Every recommendation arrives with the reason and the data behind it, so an officer can judge it rather than trust it blindly.</p>
+      </div>
+      <div class="safe reveal" style="--i:3">
+        <h3>Graceful escalation</h3>
+        <p>When an agent is unsure, the case goes to a person &mdash; not to an automatic action that no one signed off on.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Concept architecture &mdash; Agentic AI Smart City.<br>
+    A design overview of how the five agents sense, decide, and act, with the five agents also
+    implemented as a working Python simulation (smart_city_prototype.py). The outcomes shown are
+    the intended benefits of the design, not measured results.
+  </footer>
+
+</main>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    look: 'classic',
+    themeVariables: {
+      fontFamily: "'IBM Plex Sans', system-ui, sans-serif",
+      fontSize: '18px',
+      primaryColor: isDark ? '#1d2733' : '#fbf6ea',
+      primaryBorderColor: isDark ? '#e3b455' : '#a97b1e',
+      primaryTextColor: isDark ? '#e8ecf2' : '#182130',
+      secondaryColor: isDark ? '#1d2733' : '#eef2f7',
+      secondaryBorderColor: isDark ? '#7fb0e6' : '#1e3a5f',
+      tertiaryColor: isDark ? '#18202b' : '#f5f4ef',
+      lineColor: isDark ? '#54627a' : '#b7bec9',
+      textColor: isDark ? '#e8ecf2' : '#182130',
+      edgeLabelBackground: isDark ? '#18202b' : '#ffffff'
+    }
+  });
+
+  // ---- Zoom / pan engine ----
+  const PAD = 40;
+  let activeDrag = null;
+  addEventListener('mousemove', (e) => activeDrag && activeDrag.move(e));
+  addEventListener('mouseup', () => { activeDrag && activeDrag.end(); activeDrag = null; });
+
+  function initDiagram(shell) {
+    const viewport = shell.querySelector('.mermaid-viewport');
+    const canvas = shell.querySelector('.mermaid-canvas');
+    const source = shell.querySelector('.diagram-source');
+    const label = shell.querySelector('.zoom-label');
+    const controls = shell.querySelector('.zoom-controls');
+    if (!viewport || !canvas || !source || !label) return;
+
+    let zoom = 1, baseW = 0, baseH = 0, panX = 0, panY = 0, svgEl = null;
+
+    function apply() {
+      if (!svgEl) return;
+      svgEl.style.width = (baseW * zoom) + 'px';
+      svgEl.style.height = (baseH * zoom) + 'px';
+      svgEl.style.maxWidth = 'none';
+      canvas.style.transform = `translate(${panX}px, ${panY}px)`;
+      label.textContent = Math.round(zoom * 100) + '%';
+    }
+    function fit() {
+      const vw = viewport.clientWidth - PAD;
+      const vh = viewport.clientHeight - PAD;
+      if (baseW > 0 && baseH > 0) {
+        zoom = Math.min(vw / baseW, vh / baseH, 1.9);
+        if (zoom <= 0) zoom = 1;
+      }
+      panX = (viewport.clientWidth - baseW * zoom) / 2;
+      panY = (viewport.clientHeight - baseH * zoom) / 2;
+      apply();
+    }
+    function zoomBy(factor) {
+      const cx = viewport.clientWidth / 2;
+      const cy = viewport.clientHeight / 2;
+      const next = Math.max(0.3, Math.min(zoom * factor, 4));
+      panX = cx - (cx - panX) * (next / zoom);
+      panY = cy - (cy - panY) * (next / zoom);
+      zoom = next;
+      apply();
+    }
+
+    if (controls) {
+      controls.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const a = btn.dataset.action;
+        if (a === 'zoom-in') zoomBy(1.25);
+        else if (a === 'zoom-out') zoomBy(0.8);
+        else if (a === 'zoom-fit') fit();
+        else if (a === 'zoom-one') { zoom = 1; panX = (viewport.clientWidth - baseW) / 2; panY = (viewport.clientHeight - baseH) / 2; apply(); }
+        else if (a === 'zoom-expand') openFullSize();
+      });
+    }
+
+    viewport.addEventListener('wheel', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        zoomBy(e.deltaY < 0 ? 1.1 : 0.9);
+      } else {
+        e.preventDefault();
+        panX -= e.deltaX;
+        panY -= e.deltaY;
+        apply();
+      }
+    }, { passive: false });
+
+    viewport.addEventListener('mousedown', (e) => {
+      viewport.classList.add('is-panning');
+      const sx = e.clientX, sy = e.clientY, px = panX, py = panY;
+      activeDrag = {
+        move(ev) { panX = px + (ev.clientX - sx); panY = py + (ev.clientY - sy); apply(); },
+        end() { viewport.classList.remove('is-panning'); }
+      };
+    });
+
+    function openFullSize() {
+      if (!svgEl) return;
+      const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>System overview</title>' +
+        '<style>body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:' +
+        (isDark ? '#10161f' : '#f5f4ef') + '}svg{max-width:96vw;max-height:96vh;height:auto}</style></head><body>' +
+        svgEl.outerHTML + '</body></html>';
+      const blob = new Blob([html], { type: 'text/html' });
+      window.open(URL.createObjectURL(blob), '_blank');
+    }
+
+    async function render() {
+      try {
+        const code = source.textContent.trim();
+        const id = 'mmd-' + Math.random().toString(36).slice(2, 9);
+        const { svg } = await mermaid.render(id, code);
+        canvas.innerHTML = svg;
+        svgEl = canvas.querySelector('svg');
+        const vb = svgEl.viewBox && svgEl.viewBox.baseVal;
+        if (vb && vb.width) { baseW = vb.width; baseH = vb.height; }
+        else { const r = svgEl.getBoundingClientRect(); baseW = r.width; baseH = r.height; }
+        fit();
+      } catch (err) {
+        label.textContent = 'Diagram unavailable';
+        console.error(err);
+      }
+    }
+    render();
+  }
+  document.querySelectorAll('.diagram-shell').forEach(initDiagram);
+
+  // ---- Agent explorer ----
+  const chips = document.querySelectorAll('.agent-chip');
+  const panels = document.querySelectorAll('.agent-panel');
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const id = chip.dataset.agent;
+      chips.forEach((c) => c.classList.toggle('is-active', c === chip));
+      panels.forEach((p) => p.classList.toggle('is-active', p.dataset.agent === id));
+    });
+  });
+</script>
+
+</body>
+</html>

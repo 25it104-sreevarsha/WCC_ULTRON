@@ -1,0 +1,113 @@
+{
+  "config": {
+    "seed": 42,
+    "ticks": 10,
+    "random_events": false,
+    "event_rate": 0.1,
+    "capacity": {
+      "Traffic authority": 2,
+      "Waste-collection team": 1,
+      "Facilities / energy desk": 1,
+      "Maintenance crew": 1,
+      "Emergency responders": 1
+    }
+  },
+  "agents": {
+    "TRAFFIC": {
+      "detected": 6,
+      "actions": 8
+    },
+    "WASTE": {
+      "detected": 4,
+      "actions": 3
+    },
+    "ENERGY": {
+      "detected": 1,
+      "actions": 1
+    },
+    "WATER": {
+      "detected": 1,
+      "actions": 1
+    },
+    "EMERGENCY": {
+      "detected": 3,
+      "actions": 3
+    }
+  },
+  "totals": {
+    "detected": 15,
+    "actions": 16,
+    "records": 16,
+    "resolved": 14,
+    "still_open": 2,
+    "preemptions": 1,
+    "avg_resolution_cycles": 1.79
+  },
+  "by_priority": {
+    "CRITICAL": {
+      "raised": 2,
+      "resolved": 2,
+      "avg_wait_cycles": 0,
+      "avg_resolution_cycles": 2
+    },
+    "HIGH": {
+      "raised": 4,
+      "resolved": 4,
+      "avg_wait_cycles": 0,
+      "avg_resolution_cycles": 1.75
+    },
+    "NORMAL": {
+      "raised": 7,
+      "resolved": 6,
+      "avg_wait_cycles": 0,
+      "avg_resolution_cycles": 1.67
+    },
+    "LOW": {
+      "raised": 3,
+      "resolved": 2,
+      "avg_wait_cycles": 0,
+      "avg_resolution_cycles": 2
+    }
+  },
+  "teams": {
+    "Traffic authority": {
+      "units": 2,
+      "messages": 8,
+      "utilisation_pct": 45.0,
+      "max_queue": 0
+    },
+    "Waste-collection team": {
+      "units": 1,
+      "messages": 3,
+      "utilisation_pct": 50.0,
+      "max_queue": 0
+    },
+    "Facilities / energy desk": {
+      "units": 1,
+      "messages": 1,
+      "utilisation_pct": 20.0,
+      "max_queue": 0
+    },
+    "Maintenance crew": {
+      "units": 1,
+      "messages": 1,
+      "utilisation_pct": 30.0,
+      "max_queue": 0
+    },
+    "Emergency responders": {
+      "units": 1,
+      "messages": 3,
+      "utilisation_pct": 60.0,
+      "max_queue": 1
+    }
+  },
+  "waste_routing": {
+    "routes": 3,
+    "km_planned": 48.4,
+    "km_if_fixed_order": 49.5,
+    "km_saved": 1.1
+  },
+  "energy": {
+    "est_kwh_saved": 63.4
+  }
+}

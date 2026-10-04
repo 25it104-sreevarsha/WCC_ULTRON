@@ -1,0 +1,17 @@
+uid,agent,kind,team,target,detail,priority,status,unit,opened_tick,first_started_tick,closed_tick,duration,preemptions
+0,TRAFFIC,incident,Traffic authority,North,clear accident in North,2,closed,TR-1,2,2,4,2,0
+1,TRAFFIC,action,Traffic authority,Riverside,"signal timing +12s, reroute in Riverside",3,closed,TR-2,2,2,3,1,0
+2,EMERGENCY,incident,Emergency responders,North,accident in North -> Police,1,closed,EM-1,2,2,4,2,0
+3,WATER,work_order,Maintenance crew,Riverside,leak repair in Riverside,2,closed,MT-1,3,3,6,3,0
+4,EMERGENCY,incident,Emergency responders,East,smoke near market in East -> Fire service,3,closed,EM-1,4,4,8,2,1
+5,TRAFFIC,action,Traffic authority,East,emergency corridor to East,2,closed,TR-1,5,5,6,1,0
+6,TRAFFIC,action,Traffic authority,West,"signal timing +12s, reroute in West",3,closed,TR-2,5,5,6,1,0
+7,WASTE,work_order,Waste-collection team,route,collect: Central -> Riverside -> South,4,closed,WS-1,5,5,7,2,0
+8,EMERGENCY,incident,Emergency responders,Central,fire in Central -> Fire service,1,closed,EM-1,5,5,7,2,0
+9,TRAFFIC,action,Traffic authority,Central,emergency corridor to Central,2,closed,TR-1,6,6,7,1,0
+10,TRAFFIC,action,Traffic authority,West,"signal timing +12s, reroute in West",3,closed,TR-2,6,6,7,1,0
+11,WASTE,work_order,Waste-collection team,route,collect: East,4,closed,WS-1,7,7,9,2,0
+12,ENERGY,action,Facilities / energy desk,West,energy-saving in West (~63.4 kWh),3,closed,EN-1,7,7,9,2,0
+13,TRAFFIC,action,Traffic authority,West,"signal timing +12s, reroute in West",3,closed,TR-1,9,9,10,1,0
+14,TRAFFIC,action,Traffic authority,Riverside,"signal timing +12s, reroute in Riverside",3,active,TR-1,10,10,,1,0
+15,WASTE,work_order,Waste-collection team,route,collect: West -> North,4,active,WS-1,10,10,,2,0

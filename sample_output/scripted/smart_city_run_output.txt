@@ -1,0 +1,369 @@
+==================================================================================
+AGENTIC AI SMART CITY v2  -  simulation run
+zones: Central, North, East, West, South, Riverside
+10 cycles of 30 min from 07:00 | seed 42 | scripted events
+crews: TRx2, WSx1, ENx1, MTx1, EMx1
+==================================================================================
+
+--- CYCLE 01  07:30 --------------------------------------------------------
+TRAFFIC   SENSE    Central flowing normally (0.39)
+TRAFFIC   SENSE    North flowing normally (0.31)
+TRAFFIC   SENSE    East flowing normally (0.28)
+TRAFFIC   SENSE    West flowing normally (0.39)
+TRAFFIC   SENSE    South flowing normally (0.25)
+TRAFFIC   SENSE    Riverside flowing normally (0.25)
+WASTE     SENSE    Central   bin  52.8%  +8.6%/cycle  full in ~165 min  ok
+WASTE     SENSE    North     bin  31.1%  +5.3%/cycle  full in ~386 min  ok
+WASTE     SENSE    East      bin  39.9%  +6.7%/cycle  full in ~270 min  ok
+WASTE     SENSE    West      bin  36.8%  +5.1%/cycle  full in ~370 min  ok
+WASTE     SENSE    South     bin  53.0%  +5.9%/cycle  full in ~240 min  ok
+WASTE     SENSE    Riverside bin  52.3%  +7.0%/cycle  full in ~204 min  ok
+WASTE     DECIDE   no collection needed this cycle
+ENERGY    SENSE    Central    104.7 kWh  normal  (score +0.0)
+ENERGY    SENSE    North      108.3 kWh  normal  (score +0.0)
+ENERGY    SENSE    East       118.1 kWh  normal  (score +0.0)
+ENERGY    SENSE    West       128.8 kWh  normal  (score +0.0)
+ENERGY    SENSE    South       97.5 kWh  normal  (score +0.0)
+ENERGY    SENSE    Riverside  116.5 kWh  normal  (score +0.0)
+WATER     SENSE    Central   pressure 54.2 psi, flow 110.1 L/s  ok
+WATER     SENSE    North     pressure 48.6 psi, flow 100.5 L/s  ok
+WATER     SENSE    East      pressure 54.0 psi, flow 93.7 L/s  ok
+WATER     SENSE    West      pressure 52.5 psi, flow 95.2 L/s  ok
+WATER     SENSE    South     pressure 49.7 psi, flow 106.1 L/s  ok
+WATER     SENSE    Riverside pressure 48.4 psi, flow 102.7 L/s  ok
+EMERGENCY SENSE    no active incidents
+
+--- CYCLE 02  08:00 --------------------------------------------------------
+TRAFFIC   SENSE    Central flowing normally (0.28)
+TRAFFIC   DETECT   accident in North (congestion 0.90)
+TRAFFIC   DECIDE   reroute + clear corridor; escalate to Emergency
+TRAFFIC   SENSE    East flowing normally (0.38)
+TRAFFIC   SENSE    West flowing normally (0.32)
+TRAFFIC   SENSE    South flowing normally (0.50)
+TRAFFIC   DETECT   congestion in Riverside (0.73)
+TRAFFIC   DECIDE   alternative route via arterial; adjust signals
+WASTE     SENSE    Central   bin  61.3%  +8.5%/cycle  full in ~137 min  filling
+WASTE     SENSE    North     bin  36.4%  +5.3%/cycle  full in ~360 min  ok
+WASTE     SENSE    East      bin  46.6%  +6.7%/cycle  full in ~239 min  ok
+WASTE     SENSE    West      bin  41.9%  +5.1%/cycle  full in ~342 min  ok
+WASTE     SENSE    South     bin  58.8%  +5.8%/cycle  full in ~213 min  ok
+WASTE     SENSE    Riverside bin  59.3%  +7.0%/cycle  full in ~174 min  ok
+WASTE     DECIDE   no collection needed this cycle
+ENERGY    SENSE    Central    126.6 kWh  normal  (score +1.5)
+ENERGY    SENSE    North      116.9 kWh  normal  (score +0.6)
+ENERGY    SENSE    East       119.9 kWh  normal  (score +0.1)
+ENERGY    SENSE    West       130.7 kWh  normal  (score +0.1)
+ENERGY    SENSE    South      117.3 kWh  normal  (score +1.3)
+ENERGY    SENSE    Riverside  126.4 kWh  normal  (score +0.7)
+WATER     SENSE    Central   pressure 53.6 psi, flow 107.1 L/s  ok
+WATER     SENSE    North     pressure 48.2 psi, flow 99.0 L/s  ok
+WATER     SENSE    East      pressure 53.4 psi, flow 97.0 L/s  ok
+WATER     SENSE    West      pressure 53.2 psi, flow 94.4 L/s  ok
+WATER     SENSE    South     pressure 50.1 psi, flow 105.9 L/s  ok
+WATER     SENSE    Riverside pressure 49.3 psi, flow 102.8 L/s  ok
+EMERGENCY DETECT   accident reported in North  [CRITICAL]
+EMERGENCY ROUTE    relevant service: Police
+CITY-OPS  DISPATCH TR-1 -> clear accident in North  (P2, waited 0 cycle(s), needs 2)
+CITY-OPS  DISPATCH TR-2 -> signal timing +12s, reroute in Riverside  (P3, waited 0 cycle(s), needs 1)
+CITY-OPS  DISPATCH EM-1 -> accident in North -> Police  (P1, waited 0 cycle(s), needs 2)
+
+--- CYCLE 03  08:30 --------------------------------------------------------
+CITY-OPS  TRACK    resolved: signal timing +12s, reroute in Riverside  (TR-2, P3, opened T2, closed T3)
+TRAFFIC   SENSE    Central flowing normally (0.49)
+TRAFFIC   SENSE    accident in North still being cleared
+TRAFFIC   SENSE    East flowing normally (0.25)
+TRAFFIC   SENSE    West flowing normally (0.46)
+TRAFFIC   SENSE    South flowing normally (0.39)
+TRAFFIC   SENSE    Riverside flowing normally (0.25)
+WASTE     SENSE    Central   bin  69.9%  +8.6%/cycle  full in ~106 min  filling
+WASTE     SENSE    North     bin  41.8%  +5.3%/cycle  full in ~326 min  ok
+WASTE     SENSE    East      bin  53.3%  +6.7%/cycle  full in ~209 min  ok
+WASTE     SENSE    West      bin  47.1%  +5.2%/cycle  full in ~308 min  ok
+WASTE     SENSE    South     bin  64.7%  +5.9%/cycle  full in ~181 min  filling
+WASTE     SENSE    Riverside bin  66.4%  +7.1%/cycle  full in ~143 min  filling
+WASTE     DECIDE   no collection needed this cycle
+ENERGY    SENSE    Central    129.1 kWh  normal  (score +1.0)
+ENERGY    SENSE    North      129.1 kWh  normal  (score +1.3)
+ENERGY    SENSE    East       117.8 kWh  normal  (score -0.1)
+ENERGY    SENSE    West       111.6 kWh  normal  (score -1.5)
+ENERGY    SENSE    South      114.8 kWh  normal  (score +0.6)
+ENERGY    SENSE    Riverside  142.0 kWh  normal  (score +1.6)
+WATER     SENSE    Central   pressure 53.7 psi, flow 110.5 L/s  ok
+WATER     SENSE    North     pressure 48.7 psi, flow 96.3 L/s  ok
+WATER     SENSE    East      pressure 53.8 psi, flow 97.9 L/s  ok
+WATER     SENSE    West      pressure 53.2 psi, flow 93.5 L/s  ok
+WATER     SENSE    South     pressure 50.4 psi, flow 104.0 L/s  ok
+WATER     DETECT   possible leak in Riverside (pressure 40.1 psi, flow 130.8 L/s)
+WATER     LOCATE   segment isolated to Riverside distribution line
+EMERGENCY SENSE    no active incidents
+CITY-OPS  DISPATCH MT-1 -> leak repair in Riverside  (P2, waited 0 cycle(s), needs 3)
+
+--- CYCLE 04  09:00 --------------------------------------------------------
+CITY-OPS  TRACK    resolved: clear accident in North  (TR-1, P2, opened T2, closed T4)
+CITY-OPS  TRACK    resolved: accident in North -> Police  (EM-1, P1, opened T2, closed T4)
+TRAFFIC   SENSE    Central flowing normally (0.24)
+TRAFFIC   SENSE    North flowing normally (0.36)
+TRAFFIC   SENSE    East flowing normally (0.46)
+TRAFFIC   SENSE    West flowing normally (0.26)
+TRAFFIC   SENSE    South flowing normally (0.42)
+TRAFFIC   SENSE    Riverside flowing normally (0.29)
+WASTE     SENSE    Central   bin  78.5%  +8.6%/cycle  full in ~75 min  filling
+WASTE     SENSE    North     bin  47.1%  +5.3%/cycle  full in ~298 min  ok
+WASTE     SENSE    East      bin  60.0%  +6.7%/cycle  full in ~179 min  filling
+WASTE     SENSE    West      bin  52.2%  +5.1%/cycle  full in ~279 min  ok
+WASTE     SENSE    South     bin  70.6%  +5.9%/cycle  full in ~150 min  filling
+WASTE     SENSE    Riverside bin  73.4%  +7.0%/cycle  full in ~113 min  filling
+WASTE     DECIDE   no collection needed this cycle
+ENERGY    SENSE    Central    129.1 kWh  normal  (score +0.6)
+ENERGY    SENSE    North      137.8 kWh  normal  (score +1.3)
+ENERGY    SENSE    East       122.0 kWh  normal  (score +0.3)
+ENERGY    SENSE    West        98.9 kWh  normal  (score -1.7)
+ENERGY    SENSE    South      112.6 kWh  normal  (score +0.3)
+ENERGY    SENSE    Riverside  117.8 kWh  normal  (score -0.5)
+WATER     SENSE    Central   pressure 54.4 psi, flow 112.5 L/s  ok
+WATER     SENSE    North     pressure 49.1 psi, flow 96.1 L/s  ok
+WATER     SENSE    East      pressure 53.1 psi, flow 99.8 L/s  ok
+WATER     SENSE    West      pressure 53.8 psi, flow 91.8 L/s  ok
+WATER     SENSE    South     pressure 50.4 psi, flow 102.4 L/s  ok
+WATER     SENSE    Riverside leak still active, repair already ordered
+EMERGENCY DETECT   smoke near market reported in East  [NORMAL]
+EMERGENCY ROUTE    relevant service: Fire service
+CITY-OPS  DISPATCH EM-1 -> smoke near market in East -> Fire service  (P3, waited 0 cycle(s), needs 2)
+
+--- CYCLE 05  09:30 --------------------------------------------------------
+TRAFFIC   DECIDE   green-wave corridor to East for Fire service (signal from EMERGENCY)
+TRAFFIC   SENSE    Central flowing normally (0.24)
+TRAFFIC   SENSE    North flowing normally (0.37)
+TRAFFIC   SENSE    East flowing normally (0.44)
+TRAFFIC   DETECT   congestion in West (0.81)
+TRAFFIC   DECIDE   alternative route via arterial; adjust signals
+TRAFFIC   SENSE    South flowing normally (0.33)
+TRAFFIC   SENSE    Riverside flowing normally (0.42)
+WASTE     SENSE    Central   bin  87.0%  +8.6%/cycle  full in ~46 min  FULL
+WASTE     SENSE    North     bin  52.5%  +5.4%/cycle  full in ~266 min  ok
+WASTE     SENSE    East      bin  66.7%  +6.7%/cycle  full in ~149 min  filling
+WASTE     SENSE    West      bin  57.3%  +5.1%/cycle  full in ~250 min  ok
+WASTE     SENSE    South     bin  76.5%  +5.9%/cycle  full in ~119 min  filling
+WASTE     SENSE    Riverside bin  80.4%  +7.0%/cycle  full in ~84 min  FULL
+WASTE     PREDICT  South will overflow in ~119 min: adding to this trip
+WASTE     DETECT   3 bin(s) full or about to overflow: Central, Riverside, South
+WASTE     OPTIMISE route Central -> Riverside -> South  15.3 km (fixed order would be 16.4 km)
+ENERGY    SENSE    Central    134.8 kWh  normal  (score +0.8)
+ENERGY    SENSE    North      132.0 kWh  normal  (score +0.5)
+ENERGY    SENSE    East       125.5 kWh  normal  (score +0.5)
+ENERGY    SENSE    West        96.8 kWh  normal  (score -1.0)
+ENERGY    SENSE    South      108.9 kWh  normal  (score +0.0)
+ENERGY    SENSE    Riverside  116.3 kWh  normal  (score -0.5)
+WATER     SENSE    Central   pressure 54.3 psi, flow 110.1 L/s  ok
+WATER     SENSE    North     pressure 48.4 psi, flow 94.5 L/s  ok
+WATER     SENSE    East      pressure 53.4 psi, flow 97.3 L/s  ok
+WATER     SENSE    West      pressure 54.2 psi, flow 95.1 L/s  ok
+WATER     SENSE    South     pressure 49.7 psi, flow 102.1 L/s  ok
+WATER     SENSE    Riverside leak still active, repair already ordered
+EMERGENCY DETECT   fire reported in Central  [CRITICAL]
+EMERGENCY ROUTE    relevant service: Fire service
+CITY-OPS  DISPATCH TR-1 -> emergency corridor to East  (P2, waited 0 cycle(s), needs 1)
+CITY-OPS  DISPATCH TR-2 -> signal timing +12s, reroute in West  (P3, waited 0 cycle(s), needs 1)
+CITY-OPS  DISPATCH WS-1 -> collect: Central -> Riverside -> South  (P4, waited 0 cycle(s), needs 2)
+CITY-OPS  PREEMPT  EM-1 pulled off 'smoke near market in East -> Fire service' (P3) for 'fire in Central -> Fire service' (P1)
+CITY-OPS  DISPATCH EM-1 -> fire in Central -> Fire service  (P1, waited 0 cycle(s), needs 2)
+CITY-OPS  QUEUED   smoke near market in East -> Fire service (P3) waiting for Emergency responders, position 1, all 1 unit(s) busy
+
+--- CYCLE 06  10:00 --------------------------------------------------------
+CITY-OPS  TRACK    resolved: emergency corridor to East  (TR-1, P2, opened T5, closed T6)
+CITY-OPS  TRACK    resolved: signal timing +12s, reroute in West  (TR-2, P3, opened T5, closed T6)
+CITY-OPS  TRACK    resolved: leak repair in Riverside  (MT-1, P2, opened T3, closed T6)
+TRAFFIC   DECIDE   green-wave corridor to Central for Fire service (signal from EMERGENCY)
+TRAFFIC   SENSE    Central flowing normally (0.49)
+TRAFFIC   SENSE    North flowing normally (0.45)
+TRAFFIC   SENSE    East flowing normally (0.35)
+TRAFFIC   DETECT   congestion in West (0.79)
+TRAFFIC   DECIDE   alternative route via arterial; adjust signals
+TRAFFIC   SENSE    South flowing normally (0.50)
+TRAFFIC   SENSE    Riverside flowing normally (0.44)
+WASTE     SENSE    Central   bin  95.6%  +8.6%/cycle  full in ~15 min  FULL
+WASTE     SENSE    North     bin  57.8%  +5.3%/cycle  full in ~237 min  ok
+WASTE     SENSE    East      bin  73.4%  +6.7%/cycle  full in ~119 min  filling
+WASTE     SENSE    West      bin  62.4%  +5.1%/cycle  full in ~221 min  filling
+WASTE     SENSE    South     bin  82.3%  +5.9%/cycle  full in ~91 min  FULL
+WASTE     SENSE    Riverside bin  87.4%  +7.0%/cycle  full in ~54 min  FULL
+WASTE     DECIDE   collection in progress, nothing new to add
+ENERGY    SENSE    Central    152.9 kWh  normal  (score +1.5)
+ENERGY    SENSE    North      116.9 kWh  normal  (score -0.5)
+ENERGY    SENSE    East       124.8 kWh  normal  (score +0.3)
+ENERGY    SENSE    West       105.1 kWh  normal  (score -0.3)
+ENERGY    SENSE    South      132.6 kWh  normal  (score +2.0)
+ENERGY    SENSE    Riverside  113.3 kWh  normal  (score -0.6)
+WATER     SENSE    Central   pressure 53.7 psi, flow 109.6 L/s  ok
+WATER     SENSE    North     pressure 48.2 psi, flow 94.6 L/s  ok
+WATER     SENSE    East      pressure 53.1 psi, flow 99.6 L/s  ok
+WATER     SENSE    West      pressure 53.8 psi, flow 97.6 L/s  ok
+WATER     SENSE    South     pressure 49.9 psi, flow 100.8 L/s  ok
+WATER     SENSE    Riverside pressure 50.3 psi, flow 105.2 L/s  ok
+EMERGENCY SENSE    active incidents already being handled
+CITY-OPS  DISPATCH TR-1 -> emergency corridor to Central  (P2, waited 0 cycle(s), needs 1)
+CITY-OPS  DISPATCH TR-2 -> signal timing +12s, reroute in West  (P3, waited 0 cycle(s), needs 1)
+
+--- CYCLE 07  10:30 --------------------------------------------------------
+CITY-OPS  TRACK    resolved: emergency corridor to Central  (TR-1, P2, opened T6, closed T7)
+CITY-OPS  TRACK    resolved: signal timing +12s, reroute in West  (TR-2, P3, opened T6, closed T7)
+CITY-OPS  TRACK    resolved: collect: Central -> Riverside -> South  (WS-1, P4, opened T5, closed T7)
+CITY-OPS  TRACK    resolved: fire in Central -> Fire service  (EM-1, P1, opened T5, closed T7)
+TRAFFIC   SENSE    Central flowing normally (0.26)
+TRAFFIC   SENSE    North flowing normally (0.40)
+TRAFFIC   SENSE    East flowing normally (0.24)
+TRAFFIC   SENSE    West flowing normally (0.27)
+TRAFFIC   SENSE    South flowing normally (0.39)
+TRAFFIC   SENSE    Riverside flowing normally (0.38)
+WASTE     SENSE    Central   bin   5.0%  +8.6%/cycle  full in ~333 min  ok
+WASTE     SENSE    North     bin  63.2%  +5.4%/cycle  full in ~206 min  filling
+WASTE     SENSE    East      bin  80.1%  +6.7%/cycle  full in ~89 min  FULL
+WASTE     SENSE    West      bin  67.5%  +5.1%/cycle  full in ~191 min  filling
+WASTE     SENSE    South     bin   5.0%  +5.9%/cycle  full in ~486 min  ok
+WASTE     SENSE    Riverside bin   5.0%  +7.0%/cycle  full in ~406 min  ok
+WASTE     DETECT   1 bin(s) full or about to overflow: East
+WASTE     OPTIMISE route East  14.1 km (fixed order would be 14.1 km)
+ENERGY    SENSE    Central    143.4 kWh  normal  (score +0.4)
+ENERGY    SENSE    North      143.1 kWh  normal  (score +1.3)
+ENERGY    SENSE    East       149.4 kWh  normal  (score +2.3)
+ENERGY    SENSE    West       288.1 kWh  SPIKE  (score +10.6)
+ENERGY    DETECT   abnormal consumption in West (288.1 vs baseline 108.9 kWh)
+ENERGY    PREDICT  demand will stay high; load-shift advised
+ENERGY    ACT      dim non-critical lighting + shift load (~63.4 kWh saved)
+ENERGY    SENSE    South      143.0 kWh  normal  (score +1.7)
+ENERGY    SENSE    Riverside  109.0 kWh  normal  (score -0.8)
+WATER     SENSE    Central   pressure 53.3 psi, flow 112.3 L/s  ok
+WATER     SENSE    North     pressure 48.3 psi, flow 96.2 L/s  ok
+WATER     SENSE    East      pressure 53.6 psi, flow 96.2 L/s  ok
+WATER     SENSE    West      pressure 53.7 psi, flow 97.3 L/s  ok
+WATER     SENSE    South     pressure 50.6 psi, flow 100.5 L/s  ok
+WATER     SENSE    Riverside pressure 50.8 psi, flow 102.4 L/s  ok
+EMERGENCY SENSE    no active incidents
+CITY-OPS  DISPATCH WS-1 -> collect: East  (P4, waited 0 cycle(s), needs 2)
+CITY-OPS  DISPATCH EN-1 -> energy-saving in West (~63.4 kWh)  (P3, waited 0 cycle(s), needs 2)
+CITY-OPS  DISPATCH EM-1 -> smoke near market in East -> Fire service  (P3, waited 3 cycle(s), needs 1)
+
+--- CYCLE 08  11:00 --------------------------------------------------------
+CITY-OPS  TRACK    resolved: smoke near market in East -> Fire service  (EM-1, P3, opened T4, closed T8)
+TRAFFIC   SENSE    Central flowing normally (0.46)
+TRAFFIC   SENSE    North flowing normally (0.25)
+TRAFFIC   SENSE    East flowing normally (0.41)
+TRAFFIC   SENSE    West flowing normally (0.50)
+TRAFFIC   SENSE    South flowing normally (0.20)
+TRAFFIC   SENSE    Riverside flowing normally (0.29)
+WASTE     SENSE    Central   bin  13.6%  +8.6%/cycle  full in ~301 min  ok
+WASTE     SENSE    North     bin  68.5%  +5.3%/cycle  full in ~177 min  filling
+WASTE     SENSE    East      bin  86.8%  +6.7%/cycle  full in ~59 min  FULL
+WASTE     SENSE    West      bin  72.6%  +5.1%/cycle  full in ~161 min  filling
+WASTE     SENSE    South     bin  10.9%  +5.9%/cycle  full in ~453 min  ok
+WASTE     SENSE    Riverside bin  12.0%  +7.0%/cycle  full in ~377 min  ok
+WASTE     DECIDE   collection in progress, nothing new to add
+ENERGY    SENSE    Central    160.2 kWh  normal  (score +1.2)
+ENERGY    SENSE    North      130.1 kWh  normal  (score +0.1)
+ENERGY    SENSE    East       154.8 kWh  normal  (score +1.7)
+ENERGY    SENSE    West       282.4 kWh  SPIKE  (score +10.3)
+ENERGY    SENSE    South      137.9 kWh  normal  (score +0.7)
+ENERGY    SENSE    Riverside  128.8 kWh  normal  (score +1.0)
+WATER     SENSE    Central   pressure 53.1 psi, flow 110.5 L/s  ok
+WATER     SENSE    North     pressure 48.6 psi, flow 94.6 L/s  ok
+WATER     SENSE    East      pressure 53.6 psi, flow 99.2 L/s  ok
+WATER     SENSE    West      pressure 54.3 psi, flow 94.5 L/s  ok
+WATER     SENSE    South     pressure 50.1 psi, flow 100.9 L/s  ok
+WATER     SENSE    Riverside pressure 51.0 psi, flow 105.1 L/s  ok
+EMERGENCY SENSE    no active incidents
+
+--- CYCLE 09  11:30 --------------------------------------------------------
+CITY-OPS  TRACK    resolved: collect: East  (WS-1, P4, opened T7, closed T9)
+CITY-OPS  TRACK    resolved: energy-saving in West (~63.4 kWh)  (EN-1, P3, opened T7, closed T9)
+TRAFFIC   SENSE    Central flowing normally (0.43)
+TRAFFIC   SENSE    North flowing normally (0.28)
+TRAFFIC   SENSE    East flowing normally (0.37)
+TRAFFIC   DETECT   congestion in West (0.92)
+TRAFFIC   DECIDE   alternative route via arterial; adjust signals
+TRAFFIC   SENSE    South flowing normally (0.47)
+TRAFFIC   SENSE    Riverside flowing normally (0.45)
+WASTE     SENSE    Central   bin  22.1%  +8.6%/cycle  full in ~273 min  ok
+WASTE     SENSE    North     bin  73.9%  +5.4%/cycle  full in ~146 min  filling
+WASTE     SENSE    East      bin   5.0%  +6.7%/cycle  full in ~426 min  ok
+WASTE     SENSE    West      bin  77.8%  +5.1%/cycle  full in ~130 min  filling
+WASTE     SENSE    South     bin  16.7%  +5.8%/cycle  full in ~427 min  ok
+WASTE     SENSE    Riverside bin  19.0%  +7.0%/cycle  full in ~347 min  ok
+WASTE     DECIDE   no collection needed this cycle
+ENERGY    SENSE    Central    172.4 kWh  normal  (score +1.3)
+ENERGY    SENSE    North      120.5 kWh  normal  (score -0.7)
+ENERGY    SENSE    East       134.6 kWh  normal  (score -0.2)
+ENERGY    SENSE    West       111.9 kWh  normal  (score +0.2)
+ENERGY    SENSE    South      142.8 kWh  normal  (score +0.7)
+ENERGY    SENSE    Riverside  125.5 kWh  normal  (score +0.4)
+WATER     SENSE    Central   pressure 53.4 psi, flow 111.5 L/s  ok
+WATER     SENSE    North     pressure 48.0 psi, flow 96.8 L/s  ok
+WATER     SENSE    East      pressure 53.2 psi, flow 98.4 L/s  ok
+WATER     SENSE    West      pressure 54.6 psi, flow 97.1 L/s  ok
+WATER     SENSE    South     pressure 49.5 psi, flow 102.1 L/s  ok
+WATER     SENSE    Riverside pressure 50.2 psi, flow 101.8 L/s  ok
+EMERGENCY SENSE    no active incidents
+CITY-OPS  DISPATCH TR-1 -> signal timing +12s, reroute in West  (P3, waited 0 cycle(s), needs 1)
+
+--- CYCLE 10  12:00 --------------------------------------------------------
+CITY-OPS  TRACK    resolved: signal timing +12s, reroute in West  (TR-1, P3, opened T9, closed T10)
+TRAFFIC   SENSE    Central flowing normally (0.44)
+TRAFFIC   SENSE    North flowing normally (0.21)
+TRAFFIC   SENSE    East flowing normally (0.30)
+TRAFFIC   SENSE    West flowing normally (0.44)
+TRAFFIC   SENSE    South flowing normally (0.44)
+TRAFFIC   DETECT   congestion in Riverside (0.92)
+TRAFFIC   DECIDE   alternative route via arterial; adjust signals
+WASTE     SENSE    Central   bin  30.7%  +8.6%/cycle  full in ~243 min  ok
+WASTE     SENSE    North     bin  79.2%  +5.3%/cycle  full in ~117 min  filling
+WASTE     SENSE    East      bin  11.7%  +6.7%/cycle  full in ~395 min  ok
+WASTE     SENSE    West      bin  82.9%  +5.1%/cycle  full in ~100 min  FULL
+WASTE     SENSE    South     bin  22.6%  +5.9%/cycle  full in ~396 min  ok
+WASTE     SENSE    Riverside bin  26.1%  +7.0%/cycle  full in ~315 min  ok
+WASTE     PREDICT  North will overflow in ~117 min: adding to this trip
+WASTE     DETECT   2 bin(s) full or about to overflow: West, North
+WASTE     OPTIMISE route West -> North  19.0 km (fixed order would be 19.0 km)
+ENERGY    SENSE    Central    147.7 kWh  normal  (score -0.2)
+ENERGY    SENSE    North      115.6 kWh  normal  (score -0.9)
+ENERGY    SENSE    East       131.9 kWh  normal  (score -0.3)
+ENERGY    SENSE    West       143.8 kWh  normal  (score +2.6)
+ENERGY    SENSE    South      157.9 kWh  normal  (score +1.3)
+ENERGY    SENSE    Riverside  150.3 kWh  normal  (score +2.4)
+WATER     SENSE    Central   pressure 54.1 psi, flow 109.2 L/s  ok
+WATER     SENSE    North     pressure 47.6 psi, flow 95.2 L/s  ok
+WATER     SENSE    East      pressure 53.8 psi, flow 100.2 L/s  ok
+WATER     SENSE    West      pressure 54.0 psi, flow 97.7 L/s  ok
+WATER     SENSE    South     pressure 49.2 psi, flow 106.1 L/s  ok
+WATER     SENSE    Riverside pressure 50.5 psi, flow 105.3 L/s  ok
+EMERGENCY SENSE    no active incidents
+CITY-OPS  DISPATCH TR-1 -> signal timing +12s, reroute in Riverside  (P3, waited 0 cycle(s), needs 1)
+CITY-OPS  DISPATCH WS-1 -> collect: West -> North  (P4, waited 0 cycle(s), needs 2)
+
+==================================================================================
+RUN SUMMARY
+==================================================================================
+  TRAFFIC    detected  6  |  actions  8
+  WASTE      detected  4  |  actions  3
+  ENERGY     detected  1  |  actions  1
+  WATER      detected  1  |  actions  1
+  EMERGENCY  detected  3  |  actions  3
+  TOTAL      detected 15  |  actions 16
+
+  records 16 | resolved 14 | still open 2 | pre-emptions 1
+  avg resolution : 1.79 cycles (~54 min)
+
+  by priority (wait = cycles until a crew started):
+    CRITICAL  raised  2  resolved  2  avg wait 0  avg resolution 2
+    HIGH      raised  4  resolved  4  avg wait 0  avg resolution 1.75
+    NORMAL    raised  7  resolved  6  avg wait 0  avg resolution 1.67
+    LOW       raised  3  resolved  2  avg wait 0  avg resolution 2
+
+  team load:
+    Traffic authority          2 unit(s)  util  45.0%  max queue 0  msgs 8
+    Waste-collection team      1 unit(s)  util  50.0%  max queue 0  msgs 3
+    Facilities / energy desk   1 unit(s)  util  20.0%  max queue 0  msgs 1
+    Maintenance crew           1 unit(s)  util  30.0%  max queue 0  msgs 1
+    Emergency responders       1 unit(s)  util  60.0%  max queue 1  msgs 3
+
+  waste routing  : 3 route(s), 48.4 km planned vs 49.5 km fixed-order -> 1.1 km saved
+  energy         : ~63.4 kWh saved (modelled estimate)
+==================================================================================
